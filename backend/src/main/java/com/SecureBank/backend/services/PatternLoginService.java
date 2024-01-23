@@ -1,23 +1,15 @@
 package com.SecureBank.backend.services;
 
-import com.SecureBank.backend.cipher.CipherProvider;
+import com.SecureBank.backend.algorithms.CipherProvider;
 import com.SecureBank.backend.entities.BankUser;
 import com.SecureBank.backend.entities.UserPassCharCombination;
 import com.SecureBank.backend.repositiories.BankUserRepository;
 import com.SecureBank.backend.repositiories.UserPassCharCombinationsRepository;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,8 +18,8 @@ public class PatternLoginService {
 
   private final BankUserRepository bankUserRepository;
   private final UserPassCharCombinationsRepository userPassCharCombinationsRepository;
-  private final static int COMBINATION_LENGTH = 8;
-  private final static int COMBINATIONS_NUMBER = 8;
+  private static final int MINIMAL_COMBINATION_LENGTH = 8;
+  private static final int COMBINATIONS_NUMBER = 8;
 
   private final CipherProvider cipherProvider;
 
@@ -36,13 +28,7 @@ public class PatternLoginService {
         .orElseThrow(() -> new RuntimeException("Account with provided username does not exist"));
 
     SecureRandom random = new SecureRandom();
-
-
-
     int passwordLength = password.length();
-
-    byte [] AesKey = cipherProvider.getCipherKey();
-
 
     for (int i = 0; i < COMBINATIONS_NUMBER; i++) {
       Set<Integer> usedIndexes = new HashSet<>();
@@ -50,9 +36,15 @@ public class PatternLoginService {
       StringBuilder combination= new StringBuilder();
       StringBuilder charNumbers= new StringBuilder();
 
-      while (usedIndexes.size() < COMBINATION_LENGTH) {
+      int max = passwordLength*3/4;
+      int min = MINIMAL_COMBINATION_LENGTH;
+      int combinationLength = random.nextInt((max-min+1))+min;
+      System.out.println(combinationLength);
+
+      while (usedIndexes.size() < combinationLength) {
         int randomIndex = random.nextInt(passwordLength);
-        int characterPositionInPass = randomIndex+1; //for user becouse without it it start from 0
+        int characterPositionInPass = randomIndex + 1; //for user because without it it start from 0
+
         if(!usedIndexes.contains(randomIndex)){
           charNumbers.append(characterPositionInPass).append("|");
           combination.append(password.charAt(randomIndex));

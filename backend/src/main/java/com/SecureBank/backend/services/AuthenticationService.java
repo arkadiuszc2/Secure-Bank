@@ -1,5 +1,6 @@
 package com.SecureBank.backend.services;
 
+import com.SecureBank.backend.algorithms.EntropyCalculator;
 import com.SecureBank.backend.controllers.AuthenticationController;
 import com.SecureBank.backend.entities.ActiveSession;
 import com.SecureBank.backend.entities.BankUser;
@@ -31,25 +32,41 @@ public class AuthenticationService {
   private final BankUserRepository bankUserRepository;
   private final UserPassCharCombinationsRepository userPassCharCombinationsRepository;
   private final PatternLoginService patternLoginService;
+  private final EntropyCalculator entropyCalculator;
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
   private static final int SESSION_ID_LENGTH_IN_BYTES = 128;
 
   private static final int SALT_LENGTH_IN_BYTES = 16;
+  private static final double MINIMAL_PASSWORD_ENTROPY = 80;
+  private static final int MINIMAL_PASSWORD_LENGTH = 16;
 
-  public void registerUser(String username, String password){
+  public String registerUser(String username, String password){
     byte [] passwordByteFormat= password.getBytes(StandardCharsets.UTF_8);
     byte [] passwordSalt = generateSecureRandomBytes(SALT_LENGTH_IN_BYTES);
     byte [] passwordHashed = hashData(passwordByteFormat, passwordSalt);
-    BankUser newBankUser = new BankUser(0, username, passwordHashed, null, passwordSalt);
+
     if (bankUserRepository.existsByUsername(username)){
       throw new RuntimeException("Provided username is already taken");
     }
-    bankUserRepository.save(newBankUser);
-    patternLoginService.generatePassCharCombinations(username, password, passwordSalt);
-    //TODO: inform about password entropy, if password has to small entropy inform user that he need to create new
-    //TODO: show user the level of entropy, >0.8 acceptable, 0.9 great, <0.8 bad -> user have to create other password
+
+    double passwordEntropy = entropyCalculator.calculateEntropy(password);
+    String entropyCategory = entropyCalculator.checkEntropyCategory(passwordEntropy);
+    String infoMessage = "Provided password strength: " + entropyCategory;
+    if(password.length() < MINIMAL_PASSWORD_LENGTH){
+      infoMessage+="Provided password is too short!";
+    }
+    else if(passwordEntropy < MINIMAL_PASSWORD_ENTROPY ){
+        infoMessage += " Provide stronger password to register! You can use uppercase and lowercase letters, special characters and digits!";
+    } else {
+      infoMessage+="\n Successfully registered, you can log in now!";
+      BankUser newBankUser = new BankUser(0, username, passwordHashed, null, passwordSalt);
+      bankUserRepository.save(newBankUser);
+      patternLoginService.generatePassCharCombinations(username, password, passwordSalt);
+    }
+
+    return infoMessage;
   }
 
   //@Transactional
@@ -122,7 +139,7 @@ public class AuthenticationService {
   }
 
   //TODO: change method name to checkIfUserHasActiveSession
-  @Transactional
+ // @Transactional
   public boolean checkIfUserAuthenticated(HttpServletRequest request){
     boolean isSessionActive = false;
 
@@ -157,7 +174,7 @@ public class AuthenticationService {
     return isSessionActive;
   }
 
-  private String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
+  public String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
     Cookie[] cookies = request.getCookies();
     String [] dataFromCookies = new String[2];
     //System.out.println(cookies[0]);

@@ -61,8 +61,8 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   public String register(@RequestParam("username") String username, @RequestParam("password") String password){
-    authenticationService.registerUser(username, password);
-    return "Successfully registered - now log in";
+    String infoMessage = authenticationService.registerUser(username, password);
+    return infoMessage;
   }
 
   @GetMapping("/logout")

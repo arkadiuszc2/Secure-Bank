@@ -10,4 +10,6 @@ public interface UserPassCharCombinationsRepository extends JpaRepository<UserPa
   Optional<UserPassCharCombination> findByCombinationNumber(int combinationNumber);
 
   UserPassCharCombination findBySelected(boolean isSelected);
+
+  void deleteAllByBankUserId(long bankUserId);
 }
