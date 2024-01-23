@@ -9,11 +9,18 @@ import com.sun.jdi.InternalException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.mapping.Array;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
@@ -26,62 +33,68 @@ public class AuthenticationService {
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
+  private static final int SESSION_ID_LENGTH_IN_BYTES = 128;
+
+  private static final int SALT_LENGTH_IN_BYTES = 16;
+
   public void registerUser(String username, String password){
-    //DONE: check if user with this username already exists
-    BankUser newBankUser = new BankUser(0, username, password);
+    byte [] passwordByteFormat= password.getBytes(StandardCharsets.UTF_8);
+    byte [] passwordSalt = generateSecureRandomBytes(SALT_LENGTH_IN_BYTES);
+    byte [] passwordHashed = hashData(passwordByteFormat, passwordSalt);
+    BankUser newBankUser = new BankUser(0, username, passwordHashed, null, passwordSalt);
     if (bankUserRepository.existsByUsername(username)){
       throw new RuntimeException("Provided username is already taken");
     }
     bankUserRepository.save(newBankUser);
+    //TODO: inform about password entropy, if password has to small entropy inform user that he need to create new
+    //TODO: show user the level of entropy, >0.8 acceptable, 0.9 great, <0.8 bad -> user have to create other password
   }
 
   @Transactional
-  public String loginUser(String username, String password, HttpServletRequest request){
+  public String loginUserWithFullPassword(String username, String password, HttpServletRequest request){
     BankUser bankUser = bankUserRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("User with this username does not exist"));
-    String passwordIndDB = bankUser.getPassword();
+    byte[] passwordHashInDb = bankUser.getPassword();
     String sessionId = null;
 
-    if(!password.equals(passwordIndDB)){
-      throw new RuntimeException("Wrong password");
+    byte [] providedPasswordByteFormat = password.getBytes();
+    byte [] providedPasswordHash = hashData(providedPasswordByteFormat, bankUser.getPasswordSalt());
+
+    System.out.println("Pass in db: " + new String(passwordHashInDb));
+    System.out.println("Pass provided by user: " + new String(providedPasswordHash));
+    if (!Arrays.equals(providedPasswordHash, passwordHashInDb)){
+      throw new RuntimeException("Wrong password!");
     }
 
      if (activeSessionRepository.existsByBankUser(bankUser)) {
         ActiveSession activeSession = activeSessionRepository.findByBankUser(bankUser);
-        System.out.println(activeSession.getId());
-
-        System.out.println(activeSession.getExpirationDate().isBefore(LocalDateTime.now()));
-        System.out.println(Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME);
+//        System.out.println(activeSession.getId());
+//        System.out.println(activeSession.getExpirationDate().isBefore(LocalDateTime.now()));
+//        System.out.println(Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME);
         if(activeSession.getExpirationDate().isBefore(LocalDateTime.now()) ||
             Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME){  //check if active session is expired and delete it (it lasted from situation
-          System.out.println("DELETE session");
+          //System.out.println("DELETE session");
           //activeSessionRepository.deleteById(activeSession.getId());                 // when user lost his cookie and went to login (not to endpoint with authentication before) so session was not dumped
           activeSessionRepository.deleteByBankUser(bankUser);
-          System.out.println("After DELETE session");
+          //System.out.println("After DELETE session");
           activeSessionRepository.flush();  //makes delete affect repo before transaction ends to enable saving new sessionId
           //System.out.println(activeSessionRepository.existsByBankUser(bankUser));     //without this line code doesnt work
         } else {                                                                // if active session not expired user is already ogged
           throw new RuntimeException("Already logged-in");
         }
     }
+    String sessionIdBase64Format = generateAndSaveSession(bankUser);
 
-    sessionId = generateSessionId();
-    activeSessionRepository.save(
-        new ActiveSession(0, sessionId, bankUser, LocalDateTime.now().plusSeconds(
-            AuthenticationController.SESSION_EXPIRATION_TIME),
-            LocalDateTime.now()));  //get sessionId expiration time fro  authenticationControllerClass
-
-
-    return sessionId;
+    return sessionIdBase64Format;
   }
 
   @Transactional
   public void logoutUser(HttpServletRequest request){
-    String sessionId = extractSessionIdFromRequest(request);
-
-    if(sessionId == null){
+    String [] dataFromRequest = extractSessionIdAndUsernameFromRequest(request);
+    String username = dataFromRequest[1];
+    if(username == null){
       throw new RuntimeException("U are not logged in");
     } else {
-      activeSessionRepository.deleteBySessionId(sessionId);
+      activeSessionRepository.deleteByBankUserUsername(username);                 // check if it works
     }
 
   }
@@ -91,24 +104,25 @@ public class AuthenticationService {
   public boolean checkIfUserAuthenticated(HttpServletRequest request){
     boolean isSessionActive = false;
 
-    String sessionId = extractSessionIdFromRequest(request);
-    System.out.println(sessionId);
+    String [] dataFromCookies = extractSessionIdAndUsernameFromRequest(request);
+    String sessionIdBase64Format = dataFromCookies[0];
+    String username = dataFromCookies[1];
+    //System.out.println(sessionId);
 
-    if(sessionId == null){                                                              //if user doesnt have active session, access is denied and he must login
+    if(sessionIdBase64Format == null){                                                              //if user doesnt have active session, access is denied and he must login
       throw new RuntimeException("User is not logged in or his sessionId expired");
     } else {
-      isSessionActive = isUserSessionActive(sessionId);
+      isSessionActive = isUserSessionActive(sessionIdBase64Format, username);
 
       if (isSessionActive) {                                                                       // basic session lifetime is 5 min (300 s) from last user action on the webpage
 
-        ActiveSession activeSession = activeSessionRepository.findBySessionId(sessionId)
+        ActiveSession activeSession = activeSessionRepository.findByBankUserUsername(username)
             .orElseThrow(() -> new InternalException(
                 "ErrorInternal: Session is active but cant get it from database "));
 
         if (isSessionMaxLifeTimeExceeded(activeSession) || isSessionExpired(
             activeSession)) {                                                                   // if session createdAt is more than 20 minutes before ||
-          activeSessionRepository.deleteBySessionId(
-              sessionId);                                 // if session is expired (time now > expiration date), user didnt make any action in 5 minutes on authorized endpoints
+          activeSessionRepository.deleteByBankUserUsername(username);                                 // if session is expired (time now > expiration date), user didnt make any action in 5 minutes on authorized endpoints
           isSessionActive = false;
 
         } else {                                                                                //if user has active session and made action in webpage extend his session lifetime
@@ -121,25 +135,35 @@ public class AuthenticationService {
     return isSessionActive;
   }
 
-  private String extractSessionIdFromRequest(HttpServletRequest request){
+  private String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
     Cookie[] cookies = request.getCookies();
-    String sessionId = null;
+    String [] dataFromCookies = new String[2];
     //System.out.println(cookies[0]);
-    System.out.println(request.getPathInfo());
+    //System.out.println(request.getPathInfo());
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (SESSION_COOKIE_NAME.equals(cookie.getName())) {
-         sessionId = cookie.getValue();
+         dataFromCookies[0] = cookie.getValue();
+        }
+        if (AuthenticationController.USERNAME_COOKIE_NAME.equals(cookie.getName())) {
+          dataFromCookies[1] = cookie.getValue();
         }
       }
     }
 
 
-    return sessionId;
+    return dataFromCookies;
   }
 
-  private boolean isUserSessionActive(String sessionId){
-    return activeSessionRepository.existsBySessionId(sessionId);
+  private boolean isUserSessionActive(String sessionIdBase64Format, String username){
+    byte [] sessionIdBytesFormat = convertSessionIdToBytes(sessionIdBase64Format);
+    System.out.println("USERNAME: " + username);
+    byte [] sessionIdSalt = bankUserRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User with username provided in cookie does not exist"))
+        .getSessionSalt();
+
+    byte [] sessionIdHashed = hashData(sessionIdBytesFormat, sessionIdSalt);
+
+    return activeSessionRepository.existsBySessionIdHashed(sessionIdHashed);            //return activeSessionRepository.existsBySessionId(sessionId);
   }
 
 //  private boolean doesSessionNeedToBeExtended(ActiveSession activeSession){
@@ -163,14 +187,57 @@ public class AuthenticationService {
   }
 
   //temporary implementation for tests
-  // TODO: make generating sessionId secure
-  private String generateSessionId(){
-    Random rand = new Random();
+  private String generateAndSaveSession(BankUser bankUser){
 
-    int randomNumber = rand.nextInt(Integer.MAX_VALUE);
+    byte[] sessionIdBytesFormat = generateSessionIdAsBytes();
+    String sessionIdBase64Format = convertSessionIdToBase64(sessionIdBytesFormat);
 
-    return String.valueOf(randomNumber);
+    byte[] sessionSalt = generateSecureRandomBytes(SALT_LENGTH_IN_BYTES);
+    byte[] sessionIdBytesFormatHash = hashData(sessionIdBytesFormat, sessionSalt);
+
+    activeSessionRepository.save(
+        new ActiveSession(0, sessionIdBytesFormatHash, bankUser, LocalDateTime.now().plusSeconds(
+            AuthenticationController.SESSION_EXPIRATION_TIME),
+            LocalDateTime.now()));  //get sessionId expiration time fro  authenticationControllerClass
+    bankUser.setSessionSalt(sessionSalt);
+    bankUserRepository.save(bankUser);
+
+
+    return sessionIdBase64Format;
 
   }
 
+  private byte[] generateSessionIdAsBytes(){
+    SecureRandom random = new SecureRandom();
+    byte[] bytes = new byte[SESSION_ID_LENGTH_IN_BYTES];
+    random.nextBytes(bytes);
+    return bytes;
+  }
+
+  private String convertSessionIdToBase64(byte[] sessionIdBytesFormat){
+    return Base64.getEncoder().encodeToString(sessionIdBytesFormat);
+  }
+
+  private byte [] convertSessionIdToBytes(String sessionIdBase64Format){
+    return Base64.getDecoder().decode(sessionIdBase64Format);
+  }
+
+  private byte[] hashData(byte[] dataByteFormat, byte [] salt){
+    byte[] dataByteFormatHashed;
+    try {
+      MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+      messageDigest.update(salt);
+      dataByteFormatHashed = messageDigest.digest(dataByteFormat);
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("Error in hashing password!");
+    }
+    return dataByteFormatHashed;
+  }
+
+  private byte[] generateSecureRandomBytes(int bytesNumber){
+    SecureRandom random = new SecureRandom();
+    byte[] bytes = new byte[bytesNumber];
+    random.nextBytes(bytes);
+    return bytes;
+  }
 }

@@ -9,13 +9,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ActiveSessionRepository extends JpaRepository<ActiveSession, Long> {
 
-  boolean existsBySessionId(String sessionId);
+  boolean existsBySessionIdHashed(byte[] sessionIdHashed);
   boolean existsByBankUser(BankUser bankuser);
 
   void deleteByBankUser(BankUser bankUser);
-  void deleteBySessionId(String sessionId);
+  void deleteBySessionIdHashed(byte[] sessionIdHashed);
 
-  Optional<ActiveSession> findBySessionId(String sessionId);
+  void deleteByBankUserUsername(String username);
+
+  Optional<ActiveSession> findBySessionIdHashed(byte [] sessionIdHashed);
 
   ActiveSession findByBankUser(BankUser bankUser);
+
+  Optional<ActiveSession> findByBankUserUsername(String username);
 }

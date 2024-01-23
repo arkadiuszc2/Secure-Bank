@@ -19,13 +19,23 @@ public class AuthenticationController {
   private final AuthenticationService authenticationService;
   public static final int SESSION_EXPIRATION_TIME = 60; //time in seconds, basic 300 s (5 min)
 
+  public static final int USER_COOKIE_EXP_TIME = 100;    //TODO: decide what value should be set
+
+  public static final String USERNAME_COOKIE_NAME = "bankClientUsername";
+
   @PostMapping("/login")
   public String login(HttpServletRequest request, HttpServletResponse response, @RequestParam("username") String username, @RequestParam("password") String password ){
-    String sessionId = authenticationService.loginUser(username, password, request);
-    Cookie cookie = new Cookie(AuthenticationService.SESSION_COOKIE_NAME, sessionId);
-    cookie.setPath("/");
-    cookie.setMaxAge(10);  //cookie is saved in web client for 300 s, if user accidentally close the page with bank cookie will still be remembered for this time
-    response.addCookie(cookie);
+    String sessionIdBase64Format = authenticationService.loginUserWithFullPassword(username, password, request);
+    Cookie sessionIdCookie = new Cookie(AuthenticationService.SESSION_COOKIE_NAME, sessionIdBase64Format);
+    sessionIdCookie.setPath("/");
+    sessionIdCookie.setMaxAge(USER_COOKIE_EXP_TIME);  //cookie is saved in web client for 300 s, if user accidentally close the page with bank cookie will still be remembered for this time
+    response.addCookie(sessionIdCookie);
+
+    Cookie usernameCookie = new Cookie(USERNAME_COOKIE_NAME, username);
+    usernameCookie.setPath("/");
+    usernameCookie.setMaxAge(USER_COOKIE_EXP_TIME);
+    response.addCookie(usernameCookie);
+
     return "Successfully logged in - sessionId assigned";
   }
 

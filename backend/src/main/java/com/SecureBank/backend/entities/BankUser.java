@@ -3,6 +3,7 @@ package com.SecureBank.backend.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,11 @@ public class BankUser {
 
   private String username;
 
-  private String password;
+  private byte [] password;
+  @Lob
+  private byte [] sessionSalt;
+
+  @Lob
+  private byte [] passwordSalt;
 
 }
