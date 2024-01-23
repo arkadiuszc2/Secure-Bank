@@ -3,8 +3,10 @@ package com.SecureBank.backend.services;
 import com.SecureBank.backend.controllers.AuthenticationController;
 import com.SecureBank.backend.entities.ActiveSession;
 import com.SecureBank.backend.entities.BankUser;
+import com.SecureBank.backend.entities.UserPassCharCombination;
 import com.SecureBank.backend.repositiories.ActiveSessionRepository;
 import com.SecureBank.backend.repositiories.BankUserRepository;
+import com.SecureBank.backend.repositiories.UserPassCharCombinationsRepository;
 import com.sun.jdi.InternalException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,10 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.NoSuchElementException;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.mapping.Array;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +29,8 @@ public class AuthenticationService {
 
   private final ActiveSessionRepository activeSessionRepository;
   private final BankUserRepository bankUserRepository;
+  private final UserPassCharCombinationsRepository userPassCharCombinationsRepository;
+  private final PatternLoginService patternLoginService;
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
@@ -46,12 +47,13 @@ public class AuthenticationService {
       throw new RuntimeException("Provided username is already taken");
     }
     bankUserRepository.save(newBankUser);
+    patternLoginService.generatePassCharCombinations(username, password, passwordSalt);
     //TODO: inform about password entropy, if password has to small entropy inform user that he need to create new
     //TODO: show user the level of entropy, >0.8 acceptable, 0.9 great, <0.8 bad -> user have to create other password
   }
 
-  @Transactional
-  public String loginUserWithFullPassword(String username, String password, HttpServletRequest request){
+  //@Transactional
+  public String login(String username, String password, HttpServletRequest request, boolean selectedPartialPassLogin){
     BankUser bankUser = bankUserRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("User with this username does not exist"));
     byte[] passwordHashInDb = bankUser.getPassword();
     String sessionId = null;
@@ -61,9 +63,28 @@ public class AuthenticationService {
 
     System.out.println("Pass in db: " + new String(passwordHashInDb));
     System.out.println("Pass provided by user: " + new String(providedPasswordHash));
-    if (!Arrays.equals(providedPasswordHash, passwordHashInDb)){
-      throw new RuntimeException("Wrong password!");
-    }
+
+    if(!selectedPartialPassLogin) {
+      if (!Arrays.equals(providedPasswordHash, passwordHashInDb)) {
+        throw new RuntimeException("Standard login failed - wrong password!");
+      }
+    } else {
+      UserPassCharCombination userPassCharCombination = userPassCharCombinationsRepository.findBySelected(true);
+          if(userPassCharCombination == null){
+            throw new RuntimeException("User didnt ask for character numbers");
+          }
+      byte [] combinationHash = userPassCharCombination.getCombinationHash();
+      userPassCharCombination.setSelected(false);
+      userPassCharCombinationsRepository.save(userPassCharCombination);
+      userPassCharCombinationsRepository.flush();
+
+      if(!Arrays.equals(combinationHash, providedPasswordHash)){
+        throw new RuntimeException("Partial login failed - wrong characters were provided");
+        }
+
+      }
+
+
 
      if (activeSessionRepository.existsByBankUser(bankUser)) {
         ActiveSession activeSession = activeSessionRepository.findByBankUser(bankUser);
@@ -87,11 +108,12 @@ public class AuthenticationService {
     return sessionIdBase64Format;
   }
 
-  @Transactional
+  //@Transactional
   public void logoutUser(HttpServletRequest request){
     String [] dataFromRequest = extractSessionIdAndUsernameFromRequest(request);
-    String username = dataFromRequest[1];
-    if(username == null){
+    String username = dataFromRequest[0];
+    String sessionId = dataFromRequest[1];
+    if(username == null || sessionId == null){
       throw new RuntimeException("U are not logged in");
     } else {
       activeSessionRepository.deleteByBankUserUsername(username);                 // check if it works
@@ -222,7 +244,7 @@ public class AuthenticationService {
     return Base64.getDecoder().decode(sessionIdBase64Format);
   }
 
-  private byte[] hashData(byte[] dataByteFormat, byte [] salt){
+  public static byte[] hashData(byte[] dataByteFormat, byte [] salt){
     byte[] dataByteFormatHashed;
     try {
       MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");

@@ -5,8 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,16 +14,26 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActiveSession {
+public class UserPassCharCombination {
 
   @Id
   @GeneratedValue
   private long id;
-  @Lob
-  private byte [] sessionIdHashed;
-  @OneToOne
+
+  @ManyToOne
   @JoinColumn(name = "bankUser_id", nullable = false)
   private BankUser bankUser;
-  private LocalDateTime expirationDate;
-  private LocalDateTime createdAt;
+
+  private int combinationNumber;
+
+  private byte [] iv;
+
+  @Lob
+  private byte[] charactersNumbers;
+
+  @Lob
+  private byte [] combinationHash;
+
+  private boolean selected;
+
 }

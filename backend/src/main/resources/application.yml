@@ -20,6 +20,9 @@ spring:
             ddl-auto: update # (create, create-drop, validate, update)
 
 ---
+my-variables:
+    key: IZeiyJbvnjQdA4tu5yc3hg==
+
 
 spring:
     config:
