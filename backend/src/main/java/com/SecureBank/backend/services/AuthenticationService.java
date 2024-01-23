@@ -27,8 +27,11 @@ public class AuthenticationService {
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
   public void registerUser(String username, String password){
-    //TODO: check if user with this username already exists
+    //DONE: check if user with this username already exists
     BankUser newBankUser = new BankUser(0, username, password);
+    if (bankUserRepository.existsByUsername(username)){
+      throw new RuntimeException("Provided username is already taken");
+    }
     bankUserRepository.save(newBankUser);
   }
 
