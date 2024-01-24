@@ -18,7 +18,7 @@ public class BankUserService {
   private final AuthenticationService authenticationService;
   private final UserPassCharCombinationsRepository userPassCharCombinationsRepository;
   private final PatternLoginService patternLoginService;
-
+  private final CredentialsCipher credentialsCipher;
   public void updatePassword( HttpServletRequest request, String password, String newPassword,
       String repeatPassword) {
     String [] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
@@ -41,5 +41,9 @@ public class BankUserService {
     userPassCharCombinationsRepository.deleteAllByBankUserId(bankUser.getId());
     patternLoginService.generatePassCharCombinations(username, newPassword, bankUser.getPasswordSalt());
 
+  }
+
+  public String [] getCredentials(HttpServletRequest request){
+    return credentialsCipher.decryptCredentials(request);
   }
 }

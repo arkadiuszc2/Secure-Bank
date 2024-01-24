@@ -1,6 +1,5 @@
 package com.SecureBank.backend.services;
 
-import com.SecureBank.backend.algorithms.CipherProvider;
 import com.SecureBank.backend.algorithms.EntropyCalculator;
 import com.SecureBank.backend.controllers.AuthenticationController;
 import com.SecureBank.backend.entities.ActiveSession;
@@ -8,13 +7,11 @@ import com.SecureBank.backend.entities.BankUser;
 import com.SecureBank.backend.entities.BankUserCredentials;
 import com.SecureBank.backend.entities.UserPassCharCombination;
 import com.SecureBank.backend.repositiories.ActiveSessionRepository;
-import com.SecureBank.backend.repositiories.BankUserCredentialsRepostitory;
 import com.SecureBank.backend.repositiories.BankUserRepository;
 import com.SecureBank.backend.repositiories.UserPassCharCombinationsRepository;
 import com.sun.jdi.InternalException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +23,6 @@ import java.util.Base64;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +34,7 @@ public class AuthenticationService {
   private final PatternLoginService patternLoginService;
   private final EntropyCalculator entropyCalculator;
   private final SameUserLoginService sameUserLoginService;
-  private final CredentialsEncryptor credentialsEncryptor;
+  private final CredentialsCipher credentialsCipher;
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
@@ -68,7 +64,7 @@ public class AuthenticationService {
     } else {
       infoMessage+="\n Successfully registered, you can log in now!";
 
-      BankUserCredentials bankUserCredentials = credentialsEncryptor.encryptCredentials(name, surname, identificationNumber);
+      BankUserCredentials bankUserCredentials = credentialsCipher.encryptCredentials(name, surname, identificationNumber);
 
       BankUser newBankUser = new BankUser(username, passwordHashed, passwordSalt, bankUserCredentials);
       bankUserRepository.save(newBankUser);
@@ -189,7 +185,7 @@ public class AuthenticationService {
     return isSessionActive;
   }
 
-  public String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
+  public static String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
     Cookie[] cookies = request.getCookies();
     String [] dataFromCookies = new String[2];
     //System.out.println(cookies[0]);
@@ -217,7 +213,7 @@ public class AuthenticationService {
 
     byte [] sessionIdHashed = hashData(sessionIdBytesFormat, sessionIdSalt);
 
-    return activeSessionRepository.existsBySessionIdHashed(sessionIdHashed);            //return activeSessionRepository.existsBySessionId(sessionId);
+    return activeSessionRepository.existsBySessionIdHashedAndBankUserUsername(sessionIdHashed, username);            //return activeSessionRepository.existsBySessionId(sessionId);
   }
 
   private void extendSession(ActiveSession activeSession){

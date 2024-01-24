@@ -73,22 +73,5 @@ public class AuthenticationController {
     return "Successfully logged out";
   }
 
-//  @GetMapping("/test")
-//  public String generateKey() throws Exception {
-//    SecretKey secretKey = generateAESKey();
-//
-//    // Konwertuj klucz do postaci Base64
-//    String aesKeyBase64 = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-//
-//    // Zapisz klucz w pliku application.yml (do zrobienia ręcznie)
-//    System.out.println("AES Key (Base64): " + aesKeyBase64);
-//    return aesKeyBase64;
-//  }
-//
-//  private SecretKey generateAESKey() throws Exception {
-//    KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-//    keyGenerator.init(128); // Długość klucza 128 bitów
-//    return keyGenerator.generateKey();
-//  }
 
 }

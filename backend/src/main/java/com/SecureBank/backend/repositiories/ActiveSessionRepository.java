@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ActiveSessionRepository extends JpaRepository<ActiveSession, Long> {
 
-  boolean existsBySessionIdHashed(byte[] sessionIdHashed);
+  boolean existsBySessionIdHashedAndBankUserUsername(byte[] sessionIdHashed, String username);
   boolean existsByBankUser(BankUser bankuser);
 
   void deleteByBankUser(BankUser bankUser);
