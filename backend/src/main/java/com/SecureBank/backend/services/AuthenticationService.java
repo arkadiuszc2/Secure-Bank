@@ -33,6 +33,7 @@ public class AuthenticationService {
   private final UserPassCharCombinationsRepository userPassCharCombinationsRepository;
   private final PatternLoginService patternLoginService;
   private final EntropyCalculator entropyCalculator;
+  private final SameUserLoginService sameUserLoginService;
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
@@ -70,8 +71,15 @@ public class AuthenticationService {
   }
 
   //@Transactional
-  public String login(String username, String password, HttpServletRequest request, boolean selectedPartialPassLogin){
+  public String login(String username, String password, boolean selectedPartialPassLogin){
     BankUser bankUser = bankUserRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("User with this username does not exist"));
+
+    sameUserLoginService.saveLoginAttempt(username);
+    if(!sameUserLoginService.isLoginWithThisUsernameAllowed(username)){
+      throw new RuntimeException("Exceeded max login attempts (" + sameUserLoginService.MAX_LOGIN_ATTEMPTS_IN_TIME_PERIOD
+          + "), wait " + sameUserLoginService.LOGIN_TIME_PERIOD + " seconds before next attempt");
+    }
+
     byte[] passwordHashInDb = bankUser.getPassword();
     String sessionId = null;
 

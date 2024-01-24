@@ -32,8 +32,8 @@ public class AuthenticationController {
   public static final String USERNAME_COOKIE_NAME = "bankClientUsername";
 
   @PostMapping("/login")
-  public String login(HttpServletRequest request, HttpServletResponse response, @RequestParam("username") String username, @RequestParam("password") String password ){
-    String sessionIdBase64Format = authenticationService.login(username, password, request, false);
+  public String login(HttpServletResponse response, @RequestParam("username") String username, @RequestParam("password") String password ){
+    String sessionIdBase64Format = authenticationService.login(username, password, false);
     Cookie sessionIdCookie = new Cookie(AuthenticationService.SESSION_COOKIE_NAME, sessionIdBase64Format);
     sessionIdCookie.setPath("/");
     sessionIdCookie.setMaxAge(USER_COOKIE_EXP_TIME);  //cookie is saved in web client for 300 s, if user accidentally close the page with bank cookie will still be remembered for this time
@@ -47,15 +47,15 @@ public class AuthenticationController {
     return "Successfully logged in - sessionId assigned";
   }
 
-  @GetMapping("requestPartialPassLogin/{username}")
+  @PostMapping("requestPartialPassLogin/{username}")
   public String requestPartialPassLogin(@PathVariable("username") String username)
       throws Exception {
     return patternLoginService.getCharacterNumbers();
   }
 
   @PostMapping("/partialPassLogin")
-  public String partialPassLogin(HttpServletRequest request, HttpServletResponse response, @RequestParam("username") String username, @RequestParam("password") String password) {
-    authenticationService.login(username, password, request, true);
+  public String partialPassLogin(@RequestParam("username") String username, @RequestParam("password") String password) {
+    authenticationService.login(username, password, true);
     return "Successfully logged in - sessionId assigned";
   }
 
@@ -65,7 +65,7 @@ public class AuthenticationController {
     return infoMessage;
   }
 
-  @GetMapping("/logout")
+  @PostMapping("/logout")
   public String logout(HttpServletRequest request){
     authenticationService.logoutUser(request);
 

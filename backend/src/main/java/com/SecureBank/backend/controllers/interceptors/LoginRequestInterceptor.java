@@ -22,7 +22,7 @@ public class LoginRequestInterceptor implements HandlerInterceptor {
 
     if(!isIpAllowedToMakeRequest){
       throw new RuntimeException("Max login requests number (" + loginRequestLimiter.MAX_REQUEST_NUMBER + ") in " + loginRequestLimiter.REQUEST_PERIOD_TIME
-          + "seconds exceeded! ");
+          + " seconds exceeded! ");
     }
 
     return isIpAllowedToMakeRequest;
