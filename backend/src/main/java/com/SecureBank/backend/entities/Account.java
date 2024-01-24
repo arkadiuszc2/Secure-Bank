@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Account {
 
-  public Account(String number, BigDecimal balance, BankUser bankUser) {
-    this.number = number;
+  public Account(String accountNumber, BigDecimal balance, BankUser bankUser) {
+    this.accountNumber = accountNumber;
     this.balance = balance;
     this.bankUser = bankUser;
   }
@@ -26,7 +26,7 @@ public class Account {
   @GeneratedValue
   private long id;
 
-  private String number;
+  private String accountNumber;
 
   private BigDecimal balance;
 

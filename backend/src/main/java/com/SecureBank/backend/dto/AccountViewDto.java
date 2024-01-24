@@ -9,7 +9,7 @@ public class AccountViewDto {
   private String balance;
 
   public AccountViewDto(Account account) {
-    this.number = account.getNumber();
+    this.number = account.getAccountNumber();
     this.balance = account.getBalance().toString();
   }
 }

@@ -27,7 +27,7 @@ public class TransferService {
     String username = cookiesData[1];
 
     Account account = accountRepository.findByBankUserUsername(username).orElseThrow(() -> new RuntimeException("Account not found"));
-    String accountNumber = account.getNumber();
+    String accountNumber = account.getAccountNumber();
     List<Transfer> transferList = transferRepository.findAllByFromAccountNumberOrToAccountNumberOrderByDate(accountNumber, accountNumber);
 
     return transferList.stream()
@@ -51,7 +51,7 @@ public class TransferService {
       throw new RuntimeException("You cannot send money to yourself!");
     }
 
-    Transfer transfer = new Transfer(senderAccount.getNumber(), receiverAccount.getNumber(), new BigDecimal(value),
+    Transfer transfer = new Transfer(senderAccount.getAccountNumber(), receiverAccount.getAccountNumber(), new BigDecimal(value),
         LocalDateTime.now());
 
     transferRepository.save(transfer);
