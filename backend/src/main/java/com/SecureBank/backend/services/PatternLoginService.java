@@ -63,7 +63,7 @@ public class PatternLoginService {
       byte [] iv = cipherProvider.generateRandomIV();
 
       try {
-        encryptedCharNumbers =cipherProvider.encryptCBC(charNumbers.toString(),iv);
+        encryptedCharNumbers = cipherProvider.encryptCBC(charNumbers.toString(),iv);
       } catch (Exception e) {
         throw new RuntimeException("Encryption failed");
       }

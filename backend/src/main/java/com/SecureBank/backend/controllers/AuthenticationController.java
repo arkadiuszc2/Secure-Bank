@@ -60,8 +60,9 @@ public class AuthenticationController {
   }
 
   @PostMapping("/register")
-  public String register(@RequestParam("username") String username, @RequestParam("password") String password){
-    String infoMessage = authenticationService.registerUser(username, password);
+  public String register(@RequestParam("username") String username, @RequestParam("password") String password,
+      @RequestParam ("fullName") String name, @RequestParam ("surname") String surname, @RequestParam ("identificationNumber") String identificationNumber){
+    String infoMessage = authenticationService.registerUser(username, password, name, surname, identificationNumber);
     return infoMessage;
   }
 

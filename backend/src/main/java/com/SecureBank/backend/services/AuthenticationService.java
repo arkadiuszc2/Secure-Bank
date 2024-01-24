@@ -1,11 +1,14 @@
 package com.SecureBank.backend.services;
 
+import com.SecureBank.backend.algorithms.CipherProvider;
 import com.SecureBank.backend.algorithms.EntropyCalculator;
 import com.SecureBank.backend.controllers.AuthenticationController;
 import com.SecureBank.backend.entities.ActiveSession;
 import com.SecureBank.backend.entities.BankUser;
+import com.SecureBank.backend.entities.BankUserCredentials;
 import com.SecureBank.backend.entities.UserPassCharCombination;
 import com.SecureBank.backend.repositiories.ActiveSessionRepository;
+import com.SecureBank.backend.repositiories.BankUserCredentialsRepostitory;
 import com.SecureBank.backend.repositiories.BankUserRepository;
 import com.SecureBank.backend.repositiories.UserPassCharCombinationsRepository;
 import com.sun.jdi.InternalException;
@@ -23,6 +26,7 @@ import java.util.Base64;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class AuthenticationService {
   private final PatternLoginService patternLoginService;
   private final EntropyCalculator entropyCalculator;
   private final SameUserLoginService sameUserLoginService;
+  private final CredentialsEncryptor credentialsEncryptor;
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
@@ -43,7 +48,7 @@ public class AuthenticationService {
   private static final double MINIMAL_PASSWORD_ENTROPY = 80;
   private static final int MINIMAL_PASSWORD_LENGTH = 16;
 
-  public String registerUser(String username, String password){
+  public String registerUser(String username, String password, String name, String surname, String identificationNumber){
     byte [] passwordByteFormat= password.getBytes(StandardCharsets.UTF_8);
     byte [] passwordSalt = generateSecureRandomBytes(SALT_LENGTH_IN_BYTES);
     byte [] passwordHashed = hashData(passwordByteFormat, passwordSalt);
@@ -62,8 +67,12 @@ public class AuthenticationService {
         infoMessage += " Provide stronger password to register! You can use uppercase and lowercase letters, special characters and digits!";
     } else {
       infoMessage+="\n Successfully registered, you can log in now!";
-      BankUser newBankUser = new BankUser(0, username, passwordHashed, null, passwordSalt);
+
+      BankUserCredentials bankUserCredentials = credentialsEncryptor.encryptCredentials(name, surname, identificationNumber);
+
+      BankUser newBankUser = new BankUser(username, passwordHashed, passwordSalt, bankUserCredentials);
       bankUserRepository.save(newBankUser);
+
       patternLoginService.generatePassCharCombinations(username, password, passwordSalt);
     }
 
@@ -108,8 +117,6 @@ public class AuthenticationService {
         }
 
       }
-
-
 
      if (activeSessionRepository.existsByBankUser(bankUser)) {
         ActiveSession activeSession = activeSessionRepository.findByBankUser(bankUser);
