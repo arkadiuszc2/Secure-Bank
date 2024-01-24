@@ -1,9 +1,10 @@
 package com.SecureBank.backend.entities;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,21 +13,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BankUser {
-
+public class RequestCounter {
   @Id
   @GeneratedValue
   private long id;
 
-  private String username;
+  private String ipAddress;
 
-  private byte [] password;
-  @Lob
-  private byte [] sessionSalt;
+  private int requestNumber;
 
-  @Lob
-  private byte [] passwordSalt;
-
-  //private boolean isLoginAlllowe;
-  //private LocalDateTime loginBlockedTill;
+  private LocalDateTime reqPeriodStartDate;
 }

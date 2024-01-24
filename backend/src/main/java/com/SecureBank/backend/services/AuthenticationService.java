@@ -205,11 +205,6 @@ public class AuthenticationService {
     return activeSessionRepository.existsBySessionIdHashed(sessionIdHashed);            //return activeSessionRepository.existsBySessionId(sessionId);
   }
 
-//  private boolean doesSessionNeedToBeExtended(ActiveSession activeSession){
-//    Duration duration = Duration.between(activeSession.getExpirationDate(), LocalDateTime.now());
-//    return duration.toSeconds() > AuthenticationController.SESSION_EXPIRATION_TIME;
-//  }
-
   private void extendSession(ActiveSession activeSession){
     activeSession.setExpirationDate(LocalDateTime.now().plusSeconds(AuthenticationController.SESSION_EXPIRATION_TIME));
     activeSessionRepository.save(activeSession);
