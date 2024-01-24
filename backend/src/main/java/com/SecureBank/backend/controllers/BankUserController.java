@@ -1,9 +1,13 @@
 package com.SecureBank.backend.controllers;
 
+import com.SecureBank.backend.dto.AccountViewDto;
+import com.SecureBank.backend.dto.TransferDto;
+import com.SecureBank.backend.entities.Account;
 import com.SecureBank.backend.entities.BankUser;
 import com.SecureBank.backend.services.BankUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/authenticated/bankUser")
+@RequestMapping("/authenticated/user")
 @RequiredArgsConstructor
 public class BankUserController {
 
@@ -29,15 +33,9 @@ public class BankUserController {
     return bankUserService.getCredentials(request);
   }
 
-  @GetMapping("/transfers ")
-  public String [] getTransfers(){
-
+  @GetMapping("/accountInfo")
+  public AccountViewDto getAccountInfo(HttpServletRequest request){
+    return bankUserService.getAccountInfo(request);
   }
-
-  @PostMapping("/createTransfer")
-  public void sendTransfer(){
-
-  }
-
 
 }

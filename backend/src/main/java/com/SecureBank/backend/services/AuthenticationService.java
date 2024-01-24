@@ -2,6 +2,7 @@ package com.SecureBank.backend.services;
 
 import com.SecureBank.backend.algorithms.EntropyCalculator;
 import com.SecureBank.backend.controllers.AuthenticationController;
+import com.SecureBank.backend.entities.Account;
 import com.SecureBank.backend.entities.ActiveSession;
 import com.SecureBank.backend.entities.BankUser;
 import com.SecureBank.backend.entities.BankUserCredentials;
@@ -12,6 +13,7 @@ import com.SecureBank.backend.repositiories.UserPassCharCombinationsRepository;
 import com.sun.jdi.InternalException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,6 +37,7 @@ public class AuthenticationService {
   private final EntropyCalculator entropyCalculator;
   private final SameUserLoginService sameUserLoginService;
   private final CredentialsCipher credentialsCipher;
+  private final AccountCreator accountCreator;
   public static final String SESSION_COOKIE_NAME = "sessionId";
   private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
 
@@ -68,14 +71,14 @@ public class AuthenticationService {
 
       BankUser newBankUser = new BankUser(username, passwordHashed, passwordSalt, bankUserCredentials);
       bankUserRepository.save(newBankUser);
-
+      accountCreator.createNewAccount(newBankUser);
       patternLoginService.generatePassCharCombinations(username, password, passwordSalt);
     }
 
     return infoMessage;
   }
 
-  //@Transactional
+  @Transactional
   public String login(String username, String password, boolean selectedPartialPassLogin){
     BankUser bankUser = bankUserRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("User with this username does not exist"));
 
