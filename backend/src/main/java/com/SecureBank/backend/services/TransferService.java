@@ -42,7 +42,7 @@ public class TransferService {
     String username = cookiesData[1];
 
     Account senderAccount = accountRepository.findByBankUserUsername(username).orElseThrow(()->new RuntimeException("User dooes not have account!"));
-    Account receiverAccount = accountRepository.findByBankUserUsername(destAccountNumber).orElseThrow(()->new RuntimeException("Receiver account dooes not have account!"));
+    Account receiverAccount = accountRepository.findByAccountNumber(destAccountNumber).orElseThrow(()->new RuntimeException("Receiver account does not exist!"));
 
     if(senderAccount.getBalance().compareTo(new BigDecimal(value)) < 0){
       throw new RuntimeException("You don't have enough money in your account!");
@@ -53,6 +53,12 @@ public class TransferService {
 
     Transfer transfer = new Transfer(senderAccount.getAccountNumber(), receiverAccount.getAccountNumber(), new BigDecimal(value),
         LocalDateTime.now());
+
+    senderAccount.setBalance(senderAccount.getBalance().subtract(new BigDecimal(value)));
+    receiverAccount.setBalance(receiverAccount.getBalance().add(new BigDecimal(value)));
+
+    accountRepository.save(senderAccount);
+    accountRepository.save(receiverAccount);
 
     transferRepository.save(transfer);
   }

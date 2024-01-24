@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BankUserCredentialsRepostitory extends JpaRepository<BankUserCredentials, Long> {
+public interface BankUserCredentialsRepository extends JpaRepository<BankUserCredentials, Long> {
 
 }

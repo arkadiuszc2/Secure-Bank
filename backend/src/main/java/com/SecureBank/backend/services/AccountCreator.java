@@ -23,7 +23,7 @@ public class AccountCreator {
       for (int i = 0; i < ACCOUNT_NUMBER_LENGTH; i++) {
         accountNumberBuilder.append(random.nextInt(10));
       }
-    } while (accountRepository.existsByNumber(accountNumberBuilder.toString()));
+    } while (accountRepository.existsByAccountNumber(accountNumberBuilder.toString()));
 
     String accountNumber = accountNumberBuilder.toString();
 

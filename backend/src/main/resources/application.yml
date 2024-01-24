@@ -3,6 +3,8 @@ logging:
     level:
         com.SecureBank.backend: DEBUG
 
+my-variables:
+    key: IZeiyJbvnjQdA4tu5yc3hg==
 ---
 
 spring:
@@ -18,10 +20,11 @@ spring:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         hibernate:
             ddl-auto: create-drop # (create, create-drop, validate, update)
-
+        defer-datasource-initialization: true
+    sql:
+        init:
+            mode: always
 ---
-my-variables:
-    key: IZeiyJbvnjQdA4tu5yc3hg==
 
 
 spring:

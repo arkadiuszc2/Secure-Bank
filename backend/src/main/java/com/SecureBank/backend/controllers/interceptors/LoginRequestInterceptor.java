@@ -16,7 +16,7 @@ public class LoginRequestInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
     String ipAddress = request.getRemoteAddr();
-    System.out.println(ipAddress);
+    System.out.println("Get request from ip: " + ipAddress);
     loginRequestLimiter.saveRequestFromIp(ipAddress);
     boolean isIpAllowedToMakeRequest = loginRequestLimiter.isIpAllowedToMakeRequest(ipAddress);
 

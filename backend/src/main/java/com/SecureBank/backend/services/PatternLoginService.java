@@ -39,7 +39,6 @@ public class PatternLoginService {
       int max = passwordLength*3/4;
       int min = MINIMAL_COMBINATION_LENGTH;
       int combinationLength = random.nextInt((max-min+1))+min;
-      System.out.println(combinationLength);
 
       while (usedIndexes.size() < combinationLength) {
         int randomIndex = random.nextInt(passwordLength);
@@ -51,10 +50,6 @@ public class PatternLoginService {
         }
         usedIndexes.add(randomIndex);
       }
-
-      System.out.println(charNumbers);
-
-
 
       byte[] hashedCombination = AuthenticationService.hashData(combination.toString().getBytes(
           StandardCharsets.UTF_8), passwordSalt);

@@ -1,8 +1,6 @@
 package com.SecureBank.backend.algorithms;
 
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -16,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CipherProvider {
 
-  private final static int IV_SIZE = 16; // in bytes
+  private static final int IV_SIZE = 16; // in bytes
 
   @Value("${my-variables.key}")
   private String aesKeyBase64;

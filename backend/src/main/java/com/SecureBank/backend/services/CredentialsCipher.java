@@ -3,7 +3,7 @@ package com.SecureBank.backend.services;
 import com.SecureBank.backend.algorithms.CipherProvider;
 import com.SecureBank.backend.entities.BankUser;
 import com.SecureBank.backend.entities.BankUserCredentials;
-import com.SecureBank.backend.repositiories.BankUserCredentialsRepostitory;
+import com.SecureBank.backend.repositiories.BankUserCredentialsRepository;
 import com.SecureBank.backend.repositiories.BankUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CredentialsCipher {
 
-  private final BankUserCredentialsRepostitory bankUserCredentialsRepostitory;
+  private final BankUserCredentialsRepository bankUserCredentialsRepository;
   private final CipherProvider cipherProvider;
   private final BankUserRepository bankUserRepository;
 
@@ -33,7 +33,7 @@ public class CredentialsCipher {
     }
 
     BankUserCredentials bankUserCredentials = new BankUserCredentials(encryptedData[0], encryptedData[1], encryptedData[2], iv[0], iv[1], iv[2]);
-    bankUserCredentialsRepostitory.save(bankUserCredentials);
+    bankUserCredentialsRepository.save(bankUserCredentials);
 
     return bankUserCredentials;
 

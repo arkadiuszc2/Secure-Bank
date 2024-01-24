@@ -94,9 +94,6 @@ public class AuthenticationService {
     byte [] providedPasswordByteFormat = password.getBytes();
     byte [] providedPasswordHash = hashData(providedPasswordByteFormat, bankUser.getPasswordSalt());
 
-    System.out.println("Pass in db: " + new String(passwordHashInDb));
-    System.out.println("Pass provided by user: " + new String(providedPasswordHash));
-
     if(!selectedPartialPassLogin) {
       if (!Arrays.equals(providedPasswordHash, passwordHashInDb)) {
         throw new RuntimeException("Standard login failed - wrong password!");
@@ -119,17 +116,11 @@ public class AuthenticationService {
 
      if (activeSessionRepository.existsByBankUser(bankUser)) {
         ActiveSession activeSession = activeSessionRepository.findByBankUser(bankUser);
-//        System.out.println(activeSession.getId());
-//        System.out.println(activeSession.getExpirationDate().isBefore(LocalDateTime.now()));
-//        System.out.println(Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME);
         if(activeSession.getExpirationDate().isBefore(LocalDateTime.now()) ||
             Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME){  //check if active session is expired and delete it (it lasted from situation
-          //System.out.println("DELETE session");
-          //activeSessionRepository.deleteById(activeSession.getId());                 // when user lost his cookie and went to login (not to endpoint with authentication before) so session was not dumped
+                           // when user lost his cookie and went to login (not to endpoint with authentication before) so session was not dumped
           activeSessionRepository.deleteByBankUser(bankUser);
-          //System.out.println("After DELETE session");
           activeSessionRepository.flush();  //makes delete affect repo before transaction ends to enable saving new sessionId
-          //System.out.println(activeSessionRepository.existsByBankUser(bankUser));     //without this line code doesnt work
         } else {                                                                // if active session not expired user is already ogged
           throw new RuntimeException("Already logged-in");
         }
@@ -153,14 +144,14 @@ public class AuthenticationService {
   }
 
   //TODO: change method name to checkIfUserHasActiveSession
- // @Transactional
+  @Transactional
   public boolean checkIfUserAuthenticated(HttpServletRequest request){
     boolean isSessionActive = false;
 
     String [] dataFromCookies = extractSessionIdAndUsernameFromRequest(request);
     String sessionIdBase64Format = dataFromCookies[0];
     String username = dataFromCookies[1];
-    //System.out.println(sessionId);
+
 
     if(sessionIdBase64Format == null){                                                              //if user doesnt have active session, access is denied and he must login
       throw new RuntimeException("User is not logged in or his sessionId expired");
@@ -191,8 +182,6 @@ public class AuthenticationService {
   public static String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
     Cookie[] cookies = request.getCookies();
     String [] dataFromCookies = new String[2];
-    //System.out.println(cookies[0]);
-    //System.out.println(request.getPathInfo());
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (SESSION_COOKIE_NAME.equals(cookie.getName())) {
@@ -210,7 +199,6 @@ public class AuthenticationService {
 
   private boolean isUserSessionActive(String sessionIdBase64Format, String username){
     byte [] sessionIdBytesFormat = convertSessionIdToBytes(sessionIdBase64Format);
-    System.out.println("USERNAME: " + username);
     byte [] sessionIdSalt = bankUserRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User with username provided in cookie does not exist"))
         .getSessionSalt();
 
@@ -230,7 +218,6 @@ public class AuthenticationService {
   }
 
   private boolean isSessionExpired(ActiveSession activeSession){
-    //Duration duration = Duration.between(activeSession.getExpirationDate(), LocalDateTime.now());
     return LocalDateTime.now().isAfter(activeSession.getExpirationDate());
   }
 

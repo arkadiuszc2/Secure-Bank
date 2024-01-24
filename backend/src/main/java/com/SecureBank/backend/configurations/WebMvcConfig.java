@@ -19,7 +19,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    System.out.println("MESSAGE: add interceptors");
     registry.addInterceptor(new AuthenticationInterceptor(authenticationService)).addPathPatterns("/authenticated/**");  //maybe change to * ?
     registry.addInterceptor(new LoginRequestInterceptor(loginRequestLimiter)).addPathPatterns("/notAuthenticated/**");  //maybe change to * ?
   }
