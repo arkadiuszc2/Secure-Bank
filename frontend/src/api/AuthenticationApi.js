@@ -4,7 +4,6 @@ const authenticationClient = backendApi('/unauthenticated')
 
 export const authenticationApi = {
   login(username, password) {
-    console.log('Login')
     return authenticationClient.get('/login', {
       params: {
         username: `${username}`,
@@ -17,12 +16,10 @@ export const authenticationApi = {
   },
 
   requestPartialPassLogin(username) {
-    console.log('Request partial login')
     return authenticationClient.post(`/requestPartialPassLogin/${username}`)
   },
 
   partialPassLogin(username, password) {
-    console.log('partialPassLogin')
     return authenticationClient.get(`/partialPassLogin`, {
       params: {
         username: `${username}`,

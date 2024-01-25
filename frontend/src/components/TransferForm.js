@@ -14,7 +14,7 @@ const TransferForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        transferApi.sendTransfer().catch((error) => {
+        transferApi.sendTransfer(transfer.destinationAccountNumber, transfer.value).catch((error) => {
             console.log('Error while fetching');
         });
         setIsPending(true);

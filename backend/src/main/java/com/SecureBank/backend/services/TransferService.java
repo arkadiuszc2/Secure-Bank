@@ -42,7 +42,6 @@ public class TransferService {
     String username = cookiesData[0];
 
     Account senderAccount = accountRepository.findByBankUserUsername(username).orElseThrow(()->new RuntimeException("User dooes not have account!"));
-    System.out.println(destAccountNumber);
     Account receiverAccount = accountRepository.findByAccountNumber(destAccountNumber).orElseThrow(()->new RuntimeException("Receiver account does not exist!"));
 
     if(senderAccount.getBalance().compareTo(new BigDecimal(value)) < 0){

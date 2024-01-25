@@ -71,6 +71,17 @@ public class PatternLoginService {
 
   public String getCharacterNumbers(String username) throws Exception {
     SecureRandom secureRandom = new SecureRandom();
+
+    if(!bankUserRepository.existsByUsername(username)){
+      int length = 8 + secureRandom.nextInt(12);
+
+      StringBuilder charNumbers = new StringBuilder();
+      for (int i = 0; i < length; i++) {
+        charNumbers.append(" ").append(secureRandom.nextInt(19));
+      }
+      return charNumbers.toString();
+    }
+
     int combinationNumber = secureRandom.nextInt(COMBINATIONS_NUMBER);
     UserPassCharCombination userPassCharCombination  = userPassCharCombinationsRepository.
         findByCombinationNumberAndBankUser_Username(combinationNumber,username).orElseThrow(() -> new RuntimeException("Error while getting numbers"));

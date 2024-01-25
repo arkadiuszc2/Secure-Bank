@@ -14,7 +14,6 @@ export const backendApi = (url) => {
   client.interceptors.response.use(response => {
     return response
   }, function (error) {
-    console.log('Error: An error occurred while calling backend', error)
     console.log(error.response.data)
 
     alert(JSON.stringify(error.response.data));

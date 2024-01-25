@@ -15,7 +15,8 @@ const UpdatePassword = () => {
         e.preventDefault();
         bankUserApi.updatePassword(password, newPassword, repeatedNewPassword).catch((error) => {
             console.log('Error while fetching');
-        });
+        }).then((res) => alert(res.data));
+        setIsPending(true);
         navigate('/credentials');
 
     }
@@ -37,10 +38,10 @@ const UpdatePassword = () => {
     const buttonTitle = "Change password"
 
     return (
-        <div className="TaskForm">
+        <div className="Form">
             <h2>Change your password</h2>
             <form onSubmit={handleSubmit}>
-                <label>Current assword: </label>
+                <label>Current password: </label>
                 <input
                     type="text"
                     required

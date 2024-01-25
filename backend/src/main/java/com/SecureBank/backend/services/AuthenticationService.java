@@ -44,8 +44,8 @@ public class AuthenticationService {
   private static final int SESSION_ID_LENGTH_IN_BYTES = 128;
 
   private static final int SALT_LENGTH_IN_BYTES = 16;
-  private static final double MINIMAL_PASSWORD_ENTROPY = 80;
-  private static final int MINIMAL_PASSWORD_LENGTH = 16;
+  public static final double MINIMAL_PASSWORD_ENTROPY = 80;
+  public static final int MINIMAL_PASSWORD_LENGTH = 16;
 
   public String registerUser(String username, String password, String name, String surname, String identificationNumber){
     byte [] passwordByteFormat= password.getBytes(StandardCharsets.UTF_8);
@@ -80,7 +80,7 @@ public class AuthenticationService {
 
   @Transactional
   public String login(String username, String password, boolean selectedPartialPassLogin){
-    BankUser bankUser = bankUserRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("User with this username does not exist"));
+    BankUser bankUser = bankUserRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("Partial login failed - wrong characters were provided"));
 
     sameUserLoginService.saveLoginAttempt(username);
     if(!sameUserLoginService.isLoginWithThisUsernameAllowed(username)){
@@ -120,6 +120,8 @@ public class AuthenticationService {
 
           activeSessionRepository.deleteByBankUser(bankUser);
           activeSessionRepository.flush();
+
+        } else {
           throw new RuntimeException("Already logged-in");
         }
     }

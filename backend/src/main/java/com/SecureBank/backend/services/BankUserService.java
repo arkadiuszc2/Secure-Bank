@@ -1,5 +1,8 @@
 package com.SecureBank.backend.services;
 
+import static com.SecureBank.backend.services.AuthenticationService.MINIMAL_PASSWORD_LENGTH;
+
+import com.SecureBank.backend.algorithms.EntropyCalculator;
 import com.SecureBank.backend.dto.AccountViewDto;
 import com.SecureBank.backend.dto.TransferDto;
 import com.SecureBank.backend.entities.Account;
@@ -11,6 +14,7 @@ import com.SecureBank.backend.repositiories.BankUserRepository;
 import com.SecureBank.backend.repositiories.TransferRepository;
 import com.SecureBank.backend.repositiories.UserPassCharCombinationsRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -28,28 +32,47 @@ public class BankUserService {
   private final PatternLoginService patternLoginService;
   private final CredentialsCipher credentialsCipher;
   private final AccountRepository accountRepository;
-  public void updatePassword( HttpServletRequest request, String password, String newPassword,
+  private final EntropyCalculator entropyCalculator;
+
+  @Transactional
+  public String updatePassword( HttpServletRequest request, String password, String newPassword,
       String repeatPassword) {
-    String [] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
-    String username = cookiesData[0];
-    BankUser bankUser = bankUserRepository.findByUsername(username)
-        .orElseThrow(() -> new NoSuchElementException("User with this username does not exist"));
 
-    byte[] passwordHashInDb = bankUser.getPassword();
-    byte[] providedPasswordByteFormat = password.getBytes();
-    byte[] providedPasswordHash = authenticationService.hashData(providedPasswordByteFormat, bankUser.getPasswordSalt());
-
-    if (!Arrays.equals(providedPasswordHash, passwordHashInDb)) {
-      throw new RuntimeException("Wrong password!");
+    double newPasswordEntropy = entropyCalculator.calculateEntropy(newPassword);
+    String entropyCategory = entropyCalculator.checkEntropyCategory(newPasswordEntropy);
+    String infoMessage = "Provided password strength: " + entropyCategory;
+    if(newPassword.length() < AuthenticationService.MINIMAL_PASSWORD_LENGTH+1){
+          infoMessage += "| Update rejected! | Provided password is too short!";
     }
-    if (!newPassword.equals(repeatPassword)){
-      throw new RuntimeException("Repeated password is not the same");
+    else if(newPasswordEntropy < AuthenticationService.MINIMAL_PASSWORD_ENTROPY ){
+      infoMessage+= ("| Update rejected! | Provide stronger password to register! You can use uppercase and lowercase letters, special characters and digits!");
+    } else {
+      infoMessage += "| \n Successfully updated password";
+
+      String[] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
+      String username = cookiesData[0];
+      BankUser bankUser = bankUserRepository.findByUsername(username)
+          .orElseThrow(() -> new NoSuchElementException("User with this username does not exist"));
+
+      byte[] passwordHashInDb = bankUser.getPassword();
+      byte[] providedPasswordByteFormat = password.getBytes();
+      byte[] providedPasswordHash = authenticationService.hashData(providedPasswordByteFormat,
+          bankUser.getPasswordSalt());
+
+      if (!Arrays.equals(providedPasswordHash, passwordHashInDb)) {
+        infoMessage += " | Update rejected! Provided wrong current password!";
+      }
+      if (!newPassword.equals(repeatPassword)) {
+        infoMessage += " | Update rejected! Repeated password does not equal new password!";
+      }
+
+      bankUser.setPassword(providedPasswordHash);
+      userPassCharCombinationsRepository.deleteAllByBankUserId(bankUser.getId());
+      patternLoginService.generatePassCharCombinations(username, newPassword,
+          bankUser.getPasswordSalt());
+
     }
-
-    bankUser.setPassword(providedPasswordHash);
-    userPassCharCombinationsRepository.deleteAllByBankUserId(bankUser.getId());
-    patternLoginService.generatePassCharCombinations(username, newPassword, bankUser.getPasswordSalt());
-
+    return infoMessage;
   }
 
   public AccountViewDto getAccountInfo(HttpServletRequest request){

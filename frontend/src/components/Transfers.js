@@ -28,7 +28,8 @@ const Transfers = () => {
           <div className="preview">
             <div className="preview-content">
               <h2>{transfer.value}</h2>
-              <p>From: {transfer.toAccountNumber}</p>
+              <p>From: {transfer.fromAccountNumber}</p>
+              <p>To: {transfer.toAccountNumber}</p>
               <p>Date: {transfer.date}</p>
             </div>
           </div>
