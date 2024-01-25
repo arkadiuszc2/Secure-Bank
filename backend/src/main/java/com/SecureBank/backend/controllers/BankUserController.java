@@ -23,7 +23,7 @@ public class BankUserController {
 
   private final BankUserService bankUserService;
 
-  @PutMapping("/updatePassword")
+  @GetMapping("/updatePassword")
   public void updatePassword(HttpServletRequest request, @RequestParam("password") String password,
       @RequestParam("newPassword") String newPassword, @RequestParam("repPassword") String repeatPassword){
     bankUserService.updatePassword(request, password, newPassword, repeatPassword);

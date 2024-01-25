@@ -16,7 +16,7 @@ function App() {
       <Navbar />
       <div className="content">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/transfers" element={<Transfers />} />
           <Route path="/credentials" element={<Credentials />} />
           <Route path="/createTransfer" element={<TransferForm />} />

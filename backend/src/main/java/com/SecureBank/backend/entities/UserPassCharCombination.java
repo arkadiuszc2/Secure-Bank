@@ -1,5 +1,6 @@
 package com.SecureBank.backend.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -27,11 +28,10 @@ public class UserPassCharCombination {
   private int combinationNumber;
 
   private byte [] iv;
-
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte[] charactersNumbers;
 
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] combinationHash;
 
   private boolean selected;

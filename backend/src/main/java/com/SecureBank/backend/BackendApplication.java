@@ -23,7 +23,11 @@ public class BackendApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins(allowedOrigins.get(0));
+				registry.addMapping("/**")
+						.allowedOrigins(allowedOrigins.get(0))
+						.allowCredentials(true)
+						.allowedMethods("GET", "POST", "PUT", "DELETE")
+						.maxAge(3600);
 			}
 		};
 	}

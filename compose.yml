@@ -5,13 +5,8 @@ services:
       - '3000:3000'
     networks:
       - network
-    depends_on:
-      backend:
-        condition: service_healthy
-      keycloak:
-        condition: service_started
 
-services:
+
   backend:
     build: backend
     environment:
@@ -20,28 +15,20 @@ services:
       - 8080:8080
     networks:
       - network
-    depends_on:
-      db:
-        condition: service_healthy
 
   db:
     image: postgres:16.0-alpine
     restart: always
     environment:
-      - POSTGRES_USER=${DATABASE_USERNAME}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=backend
     volumes:
       - db:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     networks:
       - network
-    healthcheck:
-      test: pg_isready -U postgres
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 networks:
   network:
@@ -50,7 +37,3 @@ networks:
 volumes:
   db:
     driver: local
-
-secrets:
-  db_password:
-    file: .env.password

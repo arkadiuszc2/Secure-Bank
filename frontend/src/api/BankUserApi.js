@@ -5,7 +5,7 @@ const bankUserClient = backendApi('/authenticated/bankUser')
 export const bankUserApi = {
   updatePassword (password, newPassword, repeatPassword) {
     console.log('Update password')
-    return bankUserClient.put('/updatePassword', {
+    return bankUserClient.get('/updatePassword', {
       params: {
         password:`${password}`,
         newPassword:`${newPassword}`,
@@ -16,7 +16,7 @@ export const bankUserApi = {
 
   getCredentials () {
     console.log('Show credentials')
-    return bankUserClient.get(`/showCredentials}`, {
+    return bankUserClient.get(`/showCredentials`, {
 
     })
   },

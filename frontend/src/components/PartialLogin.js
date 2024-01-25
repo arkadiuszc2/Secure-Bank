@@ -18,7 +18,6 @@ const PartialLogin = () => {
             setCharNumbers(res.data);
         }).catch(err => alert(err.message));
         setIsPendingUsername(true);
-        navigate('/transfers');
 
     }
 
@@ -26,7 +25,7 @@ const PartialLogin = () => {
         e.preventDefault();
         await authenticationApi.partialPassLogin(username, password).catch(err => alert(err.message));
         setIsPendingPassword(true);
-        navigate('/transfers');
+        navigate('/home');
 
     }
 

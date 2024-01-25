@@ -8,7 +8,7 @@ export const backendApi = (url) => {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json'
-    }
+    }, withCredentials: true
   })
 
   return client

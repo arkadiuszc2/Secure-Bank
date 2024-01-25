@@ -39,7 +39,7 @@ public class AuthenticationService {
   private final CredentialsCipher credentialsCipher;
   private final AccountCreator accountCreator;
   public static final String SESSION_COOKIE_NAME = "sessionId";
-  private static final int SESSION_MAX_LIFE_TIME = 120;   //time in seconds basic - 1200 (20 min)
+  private static final int SESSION_MAX_LIFE_TIME = 600;
 
   private static final int SESSION_ID_LENGTH_IN_BYTES = 128;
 
@@ -93,17 +93,19 @@ public class AuthenticationService {
 
     byte [] providedPasswordByteFormat = password.getBytes();
     byte [] providedPasswordHash = hashData(providedPasswordByteFormat, bankUser.getPasswordSalt());
+    System.out.println("Provided hash " + new String(providedPasswordHash));
 
     if(!selectedPartialPassLogin) {
       if (!Arrays.equals(providedPasswordHash, passwordHashInDb)) {
         throw new RuntimeException("Standard login failed - wrong password!");
       }
     } else {
-      UserPassCharCombination userPassCharCombination = userPassCharCombinationsRepository.findBySelected(true);
+      UserPassCharCombination userPassCharCombination = userPassCharCombinationsRepository.findBySelectedAndBankUser_Username(true, username);
           if(userPassCharCombination == null){
             throw new RuntimeException("Before providing characters fill in username and generate character positions");
           }
       byte [] combinationHash = userPassCharCombination.getCombinationHash();
+      System.out.println("hashInDb " + new String(combinationHash));
       userPassCharCombination.setSelected(false);
       userPassCharCombinationsRepository.save(userPassCharCombination);
       userPassCharCombinationsRepository.flush();

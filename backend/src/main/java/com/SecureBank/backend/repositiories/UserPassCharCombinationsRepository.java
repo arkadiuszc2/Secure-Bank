@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserPassCharCombinationsRepository extends JpaRepository<UserPassCharCombination, Long> {
-  Optional<UserPassCharCombination> findByCombinationNumber(int combinationNumber);
+  Optional<UserPassCharCombination> findByCombinationNumberAndBankUser_Username(int combinationNumber, String username);
 
-  UserPassCharCombination findBySelected(boolean isSelected);
+  UserPassCharCombination findBySelectedAndBankUser_Username(boolean isSelected, String username);
 
   void deleteAllByBankUserId(long bankUserId);
 }

@@ -1,5 +1,6 @@
 package com.SecureBank.backend.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,17 +17,17 @@ public class BankUserCredentials {
   @Id
   @GeneratedValue
   private long id;
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] encryptedName;
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] encryptedSurname;
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte[] encryptedIdentificationNumber;
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] ivName;
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] ivSurname;
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] ivIdentificationNumber;
 
 

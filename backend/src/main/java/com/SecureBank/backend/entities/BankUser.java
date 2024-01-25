@@ -1,5 +1,6 @@
 package com.SecureBank.backend.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -24,10 +25,10 @@ public class BankUser {
 
   private byte [] password;
 
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] sessionSalt;
 
-  @Lob
+  @Column(columnDefinition = "bytea")
   private byte [] passwordSalt;
 
   @OneToOne

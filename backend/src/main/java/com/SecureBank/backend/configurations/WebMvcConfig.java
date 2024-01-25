@@ -20,7 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new AuthenticationInterceptor(authenticationService)).addPathPatterns("/authenticated/**");  //maybe change to * ?
-    registry.addInterceptor(new LoginRequestInterceptor(loginRequestLimiter)).addPathPatterns("/notAuthenticated/**");  //maybe change to * ?
+    registry.addInterceptor(new LoginRequestInterceptor(loginRequestLimiter)).addPathPatterns("/unAuthenticated/**");  //maybe change to * ?
   }
 }
 

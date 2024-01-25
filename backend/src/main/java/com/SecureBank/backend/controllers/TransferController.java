@@ -24,7 +24,7 @@ public class TransferController {
     return transferService.getTransfers(request);
   }
 
-  @PostMapping("/sendTransfer")
+  @GetMapping("/sendTransfer")
   public void sendTransfer(HttpServletRequest request, @RequestParam("destAccountNum") String destinationAccountNumber, @RequestParam("value") String value){
     transferService.sendTransfer(request, destinationAccountNumber, value);
   }
