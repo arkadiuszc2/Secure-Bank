@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const backendApi = (url) => {
-  const backendUrl = 'http://localhost:8080/api';
+  const backendUrl = 'https://localhost/api';
 
   const client = axios.create({
     baseURL: backendUrl + url,

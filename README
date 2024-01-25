@@ -1,1 +1,13 @@
 Secure bank app
+
+Data for tests:
+
+Username: "user1"
+accountNumber: 2061327469576347407514
+accountBalance: 300
+password: passrd1$ee321321
+
+Username: "user2"
+accountNumber: 8845029962622305363440
+accountBalance: 200
+password: paasdard1$ee21211

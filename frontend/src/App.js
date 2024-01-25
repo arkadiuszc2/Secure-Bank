@@ -9,6 +9,7 @@ import PartialLogin from './components/PartialLogin';
 import Register from './components/Register';
 import Logout from './components/Logout';
 import Home from './components/Home';
+import UpdatePassword from './components/UpdatePassword';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/partialLogin" element={<PartialLogin />} />
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<Logout />} />
+          <Route path="/updatePassword" element={<UpdatePassword />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

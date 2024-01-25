@@ -1,8 +1,9 @@
 import { bankUserApi } from "../api/BankUserApi";
 import { useNavigate } from "react-router-dom";
-import './styles/TaskFrom.css'
+import { useState } from "react";
+import './styles/Form.css'
 
-const updatePassword = () => {
+const UpdatePassword = () => {
     const [isPending, setIsPending] = useState(false);
     const navigate = useNavigate();
     const [password, setPassword] = useState();
@@ -70,4 +71,4 @@ const updatePassword = () => {
     );
 }
  
-export default updatePassword;
+export default UpdatePassword;

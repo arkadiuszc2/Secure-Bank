@@ -24,10 +24,9 @@ public class BackendApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins(allowedOrigins.get(0))
-						.allowCredentials(true)
-						.allowedMethods("GET", "POST", "PUT", "DELETE")
-						.maxAge(3600);
+						.allowedOriginPatterns(allowedOrigins.get(0))
+						.allowedMethods("GET", "POST", "OPTIONS")
+						.allowCredentials(true);
 			}
 		};
 	}

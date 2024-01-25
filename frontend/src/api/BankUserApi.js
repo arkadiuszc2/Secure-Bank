@@ -16,15 +16,11 @@ export const bankUserApi = {
 
   getCredentials () {
     console.log('Show credentials')
-    return bankUserClient.get(`/showCredentials`, {
-
-    })
+    return bankUserClient.get(`/showCredentials`)
   },
 
   getAccountInfo () {
     console.log('Get account info')
-    return bankUserClient.get('/accountInfo',{
-
-    })
+    return bankUserClient.get('/accountInfo')
     },
 }

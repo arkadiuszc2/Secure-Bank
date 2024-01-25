@@ -44,9 +44,6 @@ export const authenticationApi = {
   },
 
   logout() {
-    console.log('logout')
-    return authenticationClient.post(`/logout`, {
-
-    })
+    return authenticationClient.post(`/logout`)
   },
 }

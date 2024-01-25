@@ -14,8 +14,8 @@ export const transferApi = {
         console.log('Send transfer')
         return transferClient.get('/sendTransfer', {
             params: {
-                destinationAccountNumber: `${destinationAccountNumber}`,
-                value: `${value}`,
+                destAccountNum: `${destinationAccountNumber}`,
+                value: `${value}`
             },
 
         })

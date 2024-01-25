@@ -26,9 +26,11 @@ public class DataSeeder implements CommandLineRunner {
     Account user1Account = accountRepository.findByBankUserUsername("user1").orElseThrow(()-> new RuntimeException("Data seeder ex"));
     user1Account.setBalance(new BigDecimal(300));
     accountRepository.save(user1Account);
+    System.out.println(user1Account.getAccountNumber());
 
     Account user2Account = accountRepository.findByBankUserUsername("user2").orElseThrow(()-> new RuntimeException("Data seeder ex"));
     user2Account.setBalance(new BigDecimal(200));
     accountRepository.save(user2Account);
+    System.out.println(user2Account.getAccountNumber());
   }
 }
