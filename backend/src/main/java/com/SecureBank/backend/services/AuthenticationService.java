@@ -59,7 +59,6 @@ public class AuthenticationService {
     double passwordEntropy = entropyCalculator.calculateEntropy(password);
     String entropyCategory = entropyCalculator.checkEntropyCategory(passwordEntropy);
     String infoMessage = "Provided password strength: " + entropyCategory;
-    System.out.println(passwordEntropy);
     if(password.length() < MINIMAL_PASSWORD_LENGTH){
       infoMessage+="| Register rejected! | Provided password is too short!";
     }
