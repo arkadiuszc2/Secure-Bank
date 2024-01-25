@@ -11,8 +11,9 @@ const Transfers = () => {
     transferApi.getTransfers()
       .then((res) => {
         setTransfers(res.data)
-      })
-      .catch(err => alert(err.message))
+      }).catch((error) => {
+        console.log('Error while fetching');
+    })
   }, [])
 
   return (

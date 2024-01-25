@@ -11,7 +11,8 @@ const Credentials = () => {
         bankUserApi.getCredentials()
             .then((res) => {
                 setCredentials(res.data);
-            }).catch(err => alert(err.message))
+            }).catch((error) => {
+                console.log('Error while fetching')})
     }, []);
 
     return (<div>

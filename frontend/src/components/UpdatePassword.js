@@ -12,8 +12,9 @@ const updatePassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await bankUserApi.updatePassword(password, newPassword, repeatedNewPassword).catch(err => alert(err.message));
-        setIsPending(true);
+        bankUserApi.updatePassword(password, newPassword, repeatedNewPassword).catch((error) => {
+            console.log('Error while fetching');
+        });
         navigate('/credentials');
 
     }

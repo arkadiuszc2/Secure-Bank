@@ -13,17 +13,21 @@ const PartialLogin = () => {
 
     const handleSubmitUsername = async (e) => {
         e.preventDefault();
-        await authenticationApi.requestPartialPassLogin(username)
+        authenticationApi.requestPartialPassLogin(username).catch((error) => {
+            console.log('Error while fetching');
+        })
         .then((res) => {
             setCharNumbers(res.data);
-        }).catch(err => alert(err.message));
+        })
         setIsPendingUsername(true);
 
     }
 
     const handleSubmitPassword = async (e) => {
         e.preventDefault();
-        await authenticationApi.partialPassLogin(username, password).catch(err => alert(err.message));
+        authenticationApi.partialPassLogin(username, password).catch((error) => {
+            console.log('Error while fetching');
+        })
         setIsPendingPassword(true);
         navigate('/home');
 

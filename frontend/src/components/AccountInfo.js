@@ -9,23 +9,25 @@ const AccountInfo = () => {
         bankUserApi.getAccountInfo()
             .then((res) => {
                 setAccountInfo(res.data);
-            }).catch(err => alert(err.message))
-    }, []);
+            }).catch((error) => {
+                console.log('Error while fetching');
+            }, []);
+        })
 
-    return (
-        <div>
-            <div className="details">
-                {accountInfo && (
-                    <article>
-                        <div className="details-header">Account number: </div>
-                        <p>{accountInfo.number}</p>
-                        <div className="details-header">Balance:</div>
-                        <p>{accountInfo.balance}</p>
-                    </article>)}
+        return (
+            <div>
+                <div className="details">
+                    {accountInfo && (
+                        <article>
+                            <div className="details-header">Account number: </div>
+                            <p>{accountInfo.number}</p>
+                            <div className="details-header">Balance:</div>
+                            <p>{accountInfo.balance}</p>
+                        </article>)}
+                </div>
             </div>
-        </div>
-    );
-}
+        );
+    }
 
 export default AccountInfo;
 

@@ -11,5 +11,27 @@ export const backendApi = (url) => {
     }, withCredentials: true
   })
 
-  return client
+  client.interceptors.response.use(response => {
+    return response
+  }, function (error) {
+    console.log('Error: An error occurred while calling backend', error)
+    console.log(error.response.data)
+
+    alert(JSON.stringify(error.response.data));
+
+    if (error.response) {
+      if (error.response.status === 404) {
+        return { status: error.response.status }
+      }
+
+      return Promise.reject(error.response)
+    } else if (error.request) {
+      return Promise.reject("Error: No response from the server")
+    } else {
+
+    }
+  })
+
+
+  return client;
 }

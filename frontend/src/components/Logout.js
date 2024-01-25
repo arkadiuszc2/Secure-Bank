@@ -7,7 +7,9 @@ const Logout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        authenticationApi.logout().catch(err => alert(err.message))
+        authenticationApi.logout().catch((error) => {
+            console.log('Error while fetching');
+        })
         navigate("/");
     }, [navigate]);
 

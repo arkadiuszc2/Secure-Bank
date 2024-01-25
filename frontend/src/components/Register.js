@@ -14,7 +14,9 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await authenticationApi.register(username, password, fullName, surname, id).catch(err => alert(err.message));
+        authenticationApi.register(username, password, fullName, surname, id).catch((error) => {
+            console.log('Error while fetching');
+        })
         setIsPending(true);
         navigate('/login');
 
