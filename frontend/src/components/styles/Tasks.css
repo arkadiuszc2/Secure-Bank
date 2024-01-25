@@ -1,0 +1,59 @@
+.loading p{
+    color: grey;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.taskError {
+    max-width: 500px;
+    text-align: center;
+    margin-top: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    border-radius: 5px;
+    background-color: lightcoral;
+}
+
+.task-add-link{
+    margin-left: 50%;
+}
+
+.task-add-link button{
+    padding: 10px;
+    background-color: #FF8C00;
+    border-width: 3px;
+    border-radius: 25px;
+    border-color: #DCDCDC;
+    border-style: solid;
+}
+
+.task-add-link button:hover{
+    background-color: orangered;
+  }
+
+.task-add-link button:active{
+    box-shadow: 1px 1px 5px 3px #808080;
+  }
+.search-menu {
+    justify-content: center;
+    display: flex;
+    margin: 10px;
+ }
+
+.search-menu form{
+    display: flex;
+}
+
+.search-menu form label{
+    margin-right: 10px;
+}
+
+.radio-group label, .radio-group input{
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.search-menu form button{
+    margin-left: 10px;
+}
+

@@ -1,0 +1,8 @@
+.not-found-page {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.not-found-page > * {
+    margin: 10px;
+}

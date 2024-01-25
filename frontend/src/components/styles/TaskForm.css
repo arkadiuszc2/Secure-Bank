@@ -1,0 +1,32 @@
+.TaskForm {
+    max-width: 400px;
+    margin: auto;
+    text-align: center;
+}
+
+.TaskForm label{
+    text-align: left;
+}
+
+.TaskForm input, .TaskForm  textarea, .TaskForm select{
+    width: 100%;
+    display: block;
+}
+
+.TaskForm button{
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #FF8C00;
+    border-width: 3px;
+    border-radius: 25px;
+    border-color: #DCDCDC;
+    border-style: solid;
+}
+
+.TaskForm button:hover{
+    background-color: orangered;
+  }
+
+.TaskForm button:active{
+    box-shadow: 1px 1px 5px 3px #808080;
+  }
