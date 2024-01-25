@@ -42,7 +42,7 @@ public class CredentialsCipher {
 
   public String [] decryptCredentials(HttpServletRequest request){
     String [] cookiesData = AuthenticationService.extractSessionIdAndUsernameFromRequest(request);
-    String username = cookiesData[1];
+    String username = cookiesData[0];
     int dataNumber = 3;
     String [] decryptedData = new String[dataNumber];
     BankUser bankUser = bankUserRepository.findByUsername(username)

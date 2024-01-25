@@ -27,7 +27,7 @@ export const authenticationApi = {
       params: {
         username: `${username}`,
         password: `${password}`
-      }, withCredentials: true
+      }
     })
   },
 

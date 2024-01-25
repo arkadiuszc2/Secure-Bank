@@ -31,7 +31,7 @@ public class BankUserService {
   public void updatePassword( HttpServletRequest request, String password, String newPassword,
       String repeatPassword) {
     String [] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
-    String username = cookiesData[1];
+    String username = cookiesData[0];
     BankUser bankUser = bankUserRepository.findByUsername(username)
         .orElseThrow(() -> new NoSuchElementException("User with this username does not exist"));
 
@@ -54,7 +54,7 @@ public class BankUserService {
 
   public AccountViewDto getAccountInfo(HttpServletRequest request){
     String [] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
-    String username = cookiesData[1];
+    String username = cookiesData[0];
 
     Account account = accountRepository.findByBankUserUsername(username).orElseThrow(() -> new RuntimeException("User does not have account"));
     AccountViewDto accountViewDto = new AccountViewDto(account);

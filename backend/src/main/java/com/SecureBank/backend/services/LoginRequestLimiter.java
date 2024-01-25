@@ -16,7 +16,7 @@ public class LoginRequestLimiter {
   private final RequestCounterRepository requestCounterRepository;
 
   public final int MAX_REQUEST_NUMBER = 10;
-  public final int REQUEST_PERIOD_TIME = 60; //inSeconds
+  public final int REQUEST_PERIOD_TIME = 60;
 
   public boolean isIpAllowedToMakeRequest(String ipAddress){
     boolean isAllowed = true;

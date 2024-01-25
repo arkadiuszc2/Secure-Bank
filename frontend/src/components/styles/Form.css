@@ -1,19 +1,19 @@
-.TaskForm {
+.Form {
     max-width: 400px;
     margin: auto;
     text-align: center;
 }
 
-.TaskForm label{
+.Form label{
     text-align: left;
 }
 
-.TaskForm input, .TaskForm  textarea, .TaskForm select{
+.Form input, .Form  textarea, .Form select{
     width: 100%;
     display: block;
 }
 
-.TaskForm button{
+.Form button{
     margin-top: 20px;
     padding: 10px;
     background-color: #FF8C00;
@@ -23,10 +23,10 @@
     border-style: solid;
 }
 
-.TaskForm button:hover{
+.Form button:hover{
     background-color: orangered;
   }
 
-.TaskForm button:active{
+.Form button:active{
     box-shadow: 1px 1px 5px 3px #808080;
   }

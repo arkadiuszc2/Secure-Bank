@@ -24,7 +24,7 @@ public class TransferService {
   private final AuthenticationService authenticationService;
   public List<TransferDto> getTransfers(HttpServletRequest request){
     String [] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
-    String username = cookiesData[1];
+    String username = cookiesData[0];
 
     Account account = accountRepository.findByBankUserUsername(username).orElseThrow(() -> new RuntimeException("Account not found"));
     String accountNumber = account.getAccountNumber();
@@ -39,7 +39,7 @@ public class TransferService {
 
   public void sendTransfer(HttpServletRequest request, String destAccountNumber, String value){
     String [] cookiesData = authenticationService.extractSessionIdAndUsernameFromRequest(request);
-    String username = cookiesData[1];
+    String username = cookiesData[0];
 
     Account senderAccount = accountRepository.findByBankUserUsername(username).orElseThrow(()->new RuntimeException("User dooes not have account!"));
     Account receiverAccount = accountRepository.findByAccountNumber(destAccountNumber).orElseThrow(()->new RuntimeException("Receiver account does not exist!"));

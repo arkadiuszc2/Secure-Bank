@@ -1,4 +1,5 @@
-import './styles/TaskDetails.css'
+import './styles/Details.css'
+import './styles/Contents.css'
 import { useState, useEffect } from 'react';
 import { bankUserApi } from '../api/BankUserApi';
 import { Link } from 'react-router-dom';
@@ -14,23 +15,26 @@ const Credentials = () => {
     }, []);
 
     return (<div>
-        <div className="tasks-add-link">
+        <div className="add-link">
             <Link to={"/updatePassword"}>
-                <button> Update password</button>
+                <button>Update password</button>
             </Link>
         </div>
-        <div className="task-details">
+        <div className="details">
             {credentials && (
                 <article>
-                    <div className="task-details-header">Name: </div>
+                    <div className="details-header">Name: </div>
                     <p>{credentials[0]}</p>
-                    <div className="task-details-header">Surname:</div>
+                    <div className="details-header">Surname:</div>
                     <p>{credentials[1]}</p>
-                    <div className="task-details-header">ID number:</div>
+                    <div className="details-header">ID number:</div>
                     <p>{credentials[2]}</p>
-                </article>)}
+                </article>
+            )}
         </div>
+
     </div>
+
     );
 }
 

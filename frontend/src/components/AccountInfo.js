@@ -1,4 +1,4 @@
-import './styles/TaskDetails.css'
+import './styles/Details.css'
 import { useState, useEffect } from 'react';
 import { bankUserApi } from '../api/BankUserApi';
 
@@ -14,12 +14,12 @@ const AccountInfo = () => {
 
     return (
         <div>
-            <div className="task-details">
+            <div className="details">
                 {accountInfo && (
                     <article>
-                        <div className="task-details-header">Account number: </div>
+                        <div className="details-header">Account number: </div>
                         <p>{accountInfo.number}</p>
-                        <div className="task-details-header">Balance:</div>
+                        <div className="details-header">Balance:</div>
                         <p>{accountInfo.balance}</p>
                     </article>)}
             </div>

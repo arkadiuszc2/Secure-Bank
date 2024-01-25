@@ -16,7 +16,7 @@ public class SameUserLoginService {
   private final UserLoginAttemptCounterRepository userLoginAttemptCounterRepository;
   private final BankUserRepository bankUserRepository;
   public final int MAX_LOGIN_ATTEMPTS_IN_TIME_PERIOD = 5;
-  public final int LOGIN_TIME_PERIOD = 600; //in seconds
+  public final int LOGIN_TIME_PERIOD = 600;
   public boolean isLoginWithThisUsernameAllowed(String username){
     UserLoginAttemptCounter userLoginAttemptCounter = userLoginAttemptCounterRepository.findByBankUserUsername(username);
     return userLoginAttemptCounter.getLoginAttempts() <= MAX_LOGIN_ATTEMPTS_IN_TIME_PERIOD;
@@ -24,7 +24,7 @@ public class SameUserLoginService {
 
   public void saveLoginAttempt(String username){
     UserLoginAttemptCounter userLoginAttemptCounter = userLoginAttemptCounterRepository.findByBankUserUsername(username);
-    BankUser bankUser = bankUserRepository.findByUsername(username).orElse(null);  //null will not happen, it is checked in parent method
+    BankUser bankUser = bankUserRepository.findByUsername(username).orElse(null);
 
     if(userLoginAttemptCounter==null){
       userLoginAttemptCounter = new UserLoginAttemptCounter(0, bankUser, LocalDateTime.now(), 1, false);

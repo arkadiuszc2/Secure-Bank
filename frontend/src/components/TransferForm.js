@@ -1,6 +1,6 @@
 import { useNavigate} from 'react-router-dom';
 import { transferApi } from '../api/TransferApi';
-import './styles/TaskForm.css'
+import './styles/Form.css'
 import { useState} from 'react';
 const TransferForm = () => {
 
@@ -40,7 +40,7 @@ const TransferForm = () => {
     const buttonTitle = <p>Send</p>
 
     return (
-        <div className="TaskForm">
+        <div className="Form">
             {pageTitle}
             <form onSubmit={handleSubmit}>
                 <label>Destination account number </label>

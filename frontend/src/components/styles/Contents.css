@@ -4,7 +4,7 @@
     margin-top: 20px;
 }
 
-.taskError {
+.Error {
     max-width: 500px;
     text-align: center;
     margin-top: 20px;
@@ -14,11 +14,13 @@
     background-color: lightcoral;
 }
 
-.task-add-link{
-    margin-left: 50%;
+.add-link{
+    display: flex;
+    justify-content: center; 
+    margin-top: 20px;    
 }
 
-.task-add-link button{
+.add-link button{
     padding: 10px;
     background-color: #FF8C00;
     border-width: 3px;
@@ -27,11 +29,11 @@
     border-style: solid;
 }
 
-.task-add-link button:hover{
+.add-link button:hover{
     background-color: orangered;
   }
 
-.task-add-link button:active{
+.add-link button:active{
     box-shadow: 1px 1px 5px 3px #808080;
   }
 .search-menu {

@@ -1,15 +1,15 @@
-.task-details {
+.details {
     text-align: center;
     max-width: 800px;
     margin-right: auto;
     margin-left: auto;
     margin-top: 20px;
 }
-.task-details p{
+.details p{
     margin: 10px 0px 10px 0px;
 }
 
-.task-details button{
+.details button{
     margin-top: 20px;
     padding: 10px;
     background-color: #FF8C00;
@@ -19,15 +19,15 @@
     border-style: solid;
 }
 
-.task-details button:hover{
+.details button:hover{
     background-color: orangered;
   }
 
-.task-details button:active{
+.details button:active{
     box-shadow: 1px 1px 5px 3px #808080;
   }
 
-.task-details-header {
+.details-header {
     background-color: #FF8C00;
     border-radius: 10px;
     max-width: fit-content;
@@ -36,7 +36,7 @@
     margin-left: auto;
 }
 
-.task-details-title-header {
+.details-title-header {
     background-color: #FF8C00;
     border-radius: 10px;
     max-width: fit-content;
@@ -45,6 +45,6 @@
     margin-left: auto;
 }
 
-.task-details h2 {
+.details h2 {
     margin: 10px 0px 10px 0px;
 }

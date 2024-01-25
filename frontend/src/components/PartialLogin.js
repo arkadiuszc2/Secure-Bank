@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { authenticationApi } from "../api/AuthenticationApi";
-import "./styles/TaskDetails.css"
+import "./styles/Details.css"
 import { useNavigate } from "react-router-dom";
 
 const PartialLogin = () => {
@@ -45,9 +45,9 @@ const PartialLogin = () => {
     const buttonTitlePassword="Sign in";
 
     return (
-        <div className="task-details">
+        <div className="details">
             <h2>Login</h2>
-            <div className="TaskForm">
+            <div className="Form">
             <form onSubmit={handleSubmitUsername}>
                     <label>Username: </label>
                     <input
@@ -62,7 +62,7 @@ const PartialLogin = () => {
                 </form>
                 {charNumbers && (
                 <article>
-                    <div className="task-details-header">Randomly selected character positions from your password: </div>
+                    <div className="details-header">Randomly selected character positions from your password: </div>
                     <p>{charNumbers}</p>
                 </article>)}
                 <form onSubmit={handleSubmitPassword}>

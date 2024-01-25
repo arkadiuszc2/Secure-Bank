@@ -32,10 +32,6 @@ public class AccountCreator {
     }
 
 
-
-
-
-
   private static long calculateSeed(String username) {
     long seed = 0;
     for (char c : username.toCharArray()) {

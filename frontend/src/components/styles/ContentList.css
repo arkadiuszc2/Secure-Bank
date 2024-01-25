@@ -1,15 +1,15 @@
-  .task-list{
+  .list{
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
   }
   
-  .task-list h1{
+  .list h1{
     padding: 12px;
     text-align: center;
   }
   
-  .task-preview {
+  .preview {
     padding: 14px;
     margin: 0 auto;
     display: flex;
@@ -17,11 +17,11 @@
     align-items: center;
   }
   
-  .task-preview-buttons {
+  .preview-buttons {
     padding: 5px;
   }
   
-  .task-preview-buttons button {
+  .preview-buttons button {
     width: 70px;
     height: 24px;
     background-color: #FF8C00;
@@ -30,19 +30,19 @@
     font-size: 14px;;
   }
   
-  .task-preview-buttons button:hover {
+  .preview-buttons button:hover {
     background-color: #FA8072;
     box-shadow: 1px 1px 5px 1px #808080;
   }
   
-  .task-preview h2{
+  .preview h2{
     color: #FF8C00;
   }
   
-  .task-preview:hover{
+  .preview:hover{
     box-shadow: 1px 1px 5px 3px #808080;
   }
 
-  .task-preview a{
+  .preview a{
     text-decoration: none;  /* disable underline of Link elements, link is treated like a element*/
   }

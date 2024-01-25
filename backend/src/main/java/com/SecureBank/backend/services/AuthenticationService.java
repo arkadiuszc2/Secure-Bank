@@ -39,7 +39,7 @@ public class AuthenticationService {
   private final CredentialsCipher credentialsCipher;
   private final AccountCreator accountCreator;
   public static final String SESSION_COOKIE_NAME = "sessionId";
-  private static final int SESSION_MAX_LIFE_TIME = 600;
+  private static final int SESSION_MAX_LIFE_TIME = 900;
 
   private static final int SESSION_ID_LENGTH_IN_BYTES = 128;
 
@@ -89,11 +89,9 @@ public class AuthenticationService {
     }
 
     byte[] passwordHashInDb = bankUser.getPassword();
-    String sessionId = null;
 
     byte [] providedPasswordByteFormat = password.getBytes();
     byte [] providedPasswordHash = hashData(providedPasswordByteFormat, bankUser.getPasswordSalt());
-    System.out.println("Provided hash " + new String(providedPasswordHash));
 
     if(!selectedPartialPassLogin) {
       if (!Arrays.equals(providedPasswordHash, passwordHashInDb)) {
@@ -105,7 +103,6 @@ public class AuthenticationService {
             throw new RuntimeException("Before providing characters fill in username and generate character positions");
           }
       byte [] combinationHash = userPassCharCombination.getCombinationHash();
-      System.out.println("hashInDb " + new String(combinationHash));
       userPassCharCombination.setSelected(false);
       userPassCharCombinationsRepository.save(userPassCharCombination);
       userPassCharCombinationsRepository.flush();
@@ -119,11 +116,10 @@ public class AuthenticationService {
      if (activeSessionRepository.existsByBankUser(bankUser)) {
         ActiveSession activeSession = activeSessionRepository.findByBankUser(bankUser);
         if(activeSession.getExpirationDate().isBefore(LocalDateTime.now()) ||
-            Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME){  //check if active session is expired and delete it (it lasted from situation
-                           // when user lost his cookie and went to login (not to endpoint with authentication before) so session was not dumped
+            Duration.between(activeSession.getCreatedAt(), LocalDateTime.now()).toSeconds() > SESSION_MAX_LIFE_TIME){
+
           activeSessionRepository.deleteByBankUser(bankUser);
-          activeSessionRepository.flush();  //makes delete affect repo before transaction ends to enable saving new sessionId
-        } else {                                                                // if active session not expired user is already ogged
+          activeSessionRepository.flush();
           throw new RuntimeException("Already logged-in");
         }
     }
@@ -132,7 +128,7 @@ public class AuthenticationService {
     return sessionIdBase64Format;
   }
 
-  //@Transactional
+  @Transactional
   public void logoutUser(HttpServletRequest request){
     String [] dataFromRequest = extractSessionIdAndUsernameFromRequest(request);
     String username = dataFromRequest[0];
@@ -140,38 +136,36 @@ public class AuthenticationService {
     if(username == null || sessionId == null){
       throw new RuntimeException("U are not logged in");
     } else {
-      activeSessionRepository.deleteByBankUserUsername(username);                 // check if it works
+      activeSessionRepository.deleteByBankUserUsername(username);
     }
 
   }
 
-  //TODO: change method name to checkIfUserHasActiveSession
   @Transactional
   public boolean checkIfUserAuthenticated(HttpServletRequest request){
     boolean isSessionActive = false;
 
     String [] dataFromCookies = extractSessionIdAndUsernameFromRequest(request);
-    String sessionIdBase64Format = dataFromCookies[0];
-    String username = dataFromCookies[1];
+    String username = dataFromCookies[0];
+    String sessionIdBase64Format = dataFromCookies[1];
 
 
-    if(sessionIdBase64Format == null){                                                              //if user doesnt have active session, access is denied and he must login
+    if(sessionIdBase64Format == null){
       throw new RuntimeException("User is not logged in or his sessionId expired");
     } else {
       isSessionActive = isUserSessionActive(sessionIdBase64Format, username);
 
-      if (isSessionActive) {                                                                       // basic session lifetime is 5 min (300 s) from last user action on the webpage
-
+      if (isSessionActive) {
         ActiveSession activeSession = activeSessionRepository.findByBankUserUsername(username)
             .orElseThrow(() -> new InternalException(
                 "ErrorInternal: Session is active but cant get it from database "));
 
         if (isSessionMaxLifeTimeExceeded(activeSession) || isSessionExpired(
-            activeSession)) {                                                                   // if session createdAt is more than 20 minutes before ||
-          activeSessionRepository.deleteByBankUserUsername(username);                                 // if session is expired (time now > expiration date), user didnt make any action in 5 minutes on authorized endpoints
+            activeSession)) {
+          activeSessionRepository.deleteByBankUserUsername(username);
           isSessionActive = false;
 
-        } else {                                                                                //if user has active session and made action in webpage extend his session lifetime
+        } else {
           extendSession(activeSession);
         }
       }
@@ -184,17 +178,12 @@ public class AuthenticationService {
   public static String [] extractSessionIdAndUsernameFromRequest(HttpServletRequest request){
     Cookie[] cookies = request.getCookies();
     String [] dataFromCookies = new String[2];
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (SESSION_COOKIE_NAME.equals(cookie.getName())) {
-         dataFromCookies[0] = cookie.getValue();
-        }
-        if (AuthenticationController.USERNAME_COOKIE_NAME.equals(cookie.getName())) {
-          dataFromCookies[1] = cookie.getValue();
-        }
-      }
+    if(cookies!=null) {
+      String cookieText = cookies[0].getValue();
+      String[] splitCookieText = cookieText.split("-");
+      dataFromCookies[0] = splitCookieText[0];
+      dataFromCookies[1] = splitCookieText[1];
     }
-
 
     return dataFromCookies;
   }
@@ -206,7 +195,7 @@ public class AuthenticationService {
 
     byte [] sessionIdHashed = hashData(sessionIdBytesFormat, sessionIdSalt);
 
-    return activeSessionRepository.existsBySessionIdHashedAndBankUserUsername(sessionIdHashed, username);            //return activeSessionRepository.existsBySessionId(sessionId);
+    return activeSessionRepository.existsBySessionIdHashedAndBankUserUsername(sessionIdHashed, username);
   }
 
   private void extendSession(ActiveSession activeSession){
@@ -223,7 +212,6 @@ public class AuthenticationService {
     return LocalDateTime.now().isAfter(activeSession.getExpirationDate());
   }
 
-  //temporary implementation for tests
   private String generateAndSaveSession(BankUser bankUser){
 
     byte[] sessionIdBytesFormat = generateSessionIdAsBytes();
@@ -235,7 +223,7 @@ public class AuthenticationService {
     activeSessionRepository.save(
         new ActiveSession(0, sessionIdBytesFormatHash, bankUser, LocalDateTime.now().plusSeconds(
             AuthenticationController.SESSION_EXPIRATION_TIME),
-            LocalDateTime.now()));  //get sessionId expiration time fro  authenticationControllerClass
+            LocalDateTime.now()));
     bankUser.setSessionSalt(sessionSalt);
     bankUserRepository.save(bankUser);
 

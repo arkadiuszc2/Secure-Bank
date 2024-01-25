@@ -1,6 +1,6 @@
 import { useNavigate} from 'react-router-dom';
 import { authenticationApi} from '../api/AuthenticationApi';
-import './styles/TaskForm.css'
+import './styles/Form.css'
 import { useState} from 'react';
 
 const Register = () => {
@@ -41,7 +41,7 @@ const Register = () => {
     const buttonTitle = "Register"
 
     return (
-        <div className="TaskForm">
+        <div className="Form">
             <h2>Register</h2>
             <form onSubmit={handleSubmit}>
                 <label>Username: </label>

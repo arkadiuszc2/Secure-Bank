@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CipherProvider {
 
-  private static final int IV_SIZE = 16; // in bytes
+  private static final int IV_SIZE = 16;
 
   @Value("${my-variables.key}")
   private String aesKeyBase64;

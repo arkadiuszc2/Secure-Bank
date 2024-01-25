@@ -43,7 +43,7 @@ public class PatternLoginService {
 
       while (usedIndexes.size() < combinationLength) {
         int randomIndex = random.nextInt(passwordLength);
-        int characterPositionInPass = randomIndex + 1; //for user because without it it start from 0
+        int characterPositionInPass = randomIndex + 1;
 
         if(!usedIndexes.contains(randomIndex)){
           charNumbers.append(characterPositionInPass).append(" ");
@@ -51,7 +51,7 @@ public class PatternLoginService {
         }
         usedIndexes.add(randomIndex);
       }
-      System.out.println(combination + " " + charNumbers);
+
       byte[] hashedCombination = AuthenticationService.hashData(combination.toString().getBytes(
           StandardCharsets.UTF_8), passwordSalt);
 
@@ -72,7 +72,7 @@ public class PatternLoginService {
     SecureRandom secureRandom = new SecureRandom();
     int combinationNumber = secureRandom.nextInt(COMBINATIONS_NUMBER);
     UserPassCharCombination userPassCharCombination  = userPassCharCombinationsRepository.
-        findByCombinationNumberAndBankUser_Username(combinationNumber,username).orElseThrow(() -> new RuntimeException("secert error"));
+        findByCombinationNumberAndBankUser_Username(combinationNumber,username).orElseThrow(() -> new RuntimeException("Error while getting numbers"));
 
 
     byte [] charactersNumbersEncrypted = userPassCharCombination.getCharactersNumbers();
