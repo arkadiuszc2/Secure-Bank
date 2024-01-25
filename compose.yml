@@ -1,4 +1,17 @@
 services:
+  frontend:
+    build: frontend
+    ports:
+      - '3000:3000'
+    networks:
+      - network
+    depends_on:
+      backend:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+services:
   backend:
     build: backend
     environment:
@@ -15,9 +28,9 @@ services:
     image: postgres:16.0-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=backend
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - db:/var/lib/postgresql/data
     ports:
@@ -37,3 +50,7 @@ networks:
 volumes:
   db:
     driver: local
+
+secrets:
+  db_password:
+    file: .env.password

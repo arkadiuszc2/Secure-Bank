@@ -18,8 +18,8 @@ spring:
 
     datasource:
         url: jdbc:postgresql://db:5432/backend
-        username: postgres
-        password: postgres
+        username: "postgresUser"
+        password: "Yn!U4v5zg(k2yxSt[@Vr"
     jpa:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         hibernate:
