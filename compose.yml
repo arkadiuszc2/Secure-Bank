@@ -6,7 +6,6 @@ services:
     networks:
       - network
 
-
   backend:
     build: backend
     environment:
@@ -27,6 +26,14 @@ services:
       - db:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - network
+
+  proxy:
+    build: proxy
+    ports:
+      - '80:80'
+      - '443:443'
     networks:
       - network
 

@@ -2,7 +2,7 @@ package com.SecureBank.backend.configurations;
 
 
 import com.SecureBank.backend.controllers.interceptors.AuthenticationInterceptor;
-import com.SecureBank.backend.controllers.interceptors.LoginRequestInterceptor;
+import com.SecureBank.backend.controllers.interceptors.UnauthenticatedRequestInterceptor;
 import com.SecureBank.backend.services.AuthenticationService;
 import com.SecureBank.backend.services.LoginRequestLimiter;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new AuthenticationInterceptor(authenticationService)).addPathPatterns("/authenticated/**");
-    registry.addInterceptor(new LoginRequestInterceptor(loginRequestLimiter)).addPathPatterns("/unAuthenticated/**");
+    registry.addInterceptor(new AuthenticationInterceptor(authenticationService)).addPathPatterns("/api/authenticated/**");
+    registry.addInterceptor(new UnauthenticatedRequestInterceptor(loginRequestLimiter)).addPathPatterns("/api/unauthenticated/**");
   }
 }
 

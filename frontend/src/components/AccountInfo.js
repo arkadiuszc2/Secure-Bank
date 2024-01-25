@@ -12,7 +12,7 @@ const AccountInfo = () => {
             }).catch((error) => {
                 console.log('Error while fetching');
             }, []);
-        })
+        },[])
 
         return (
             <div>

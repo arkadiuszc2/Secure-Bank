@@ -15,11 +15,9 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         authenticationApi.register(username, password, fullName, surname, id).catch((error) => {
-            console.log('Error while fetching');
-        })
+            console.log('Error while fetching')}).then((res) => alert(res.data));
+        navigate("/partialLogin")
         setIsPending(true);
-        navigate('/login');
-
     }
 
     const handleChange = (event) => {

@@ -59,13 +59,14 @@ public class AuthenticationService {
     double passwordEntropy = entropyCalculator.calculateEntropy(password);
     String entropyCategory = entropyCalculator.checkEntropyCategory(passwordEntropy);
     String infoMessage = "Provided password strength: " + entropyCategory;
+    System.out.println(passwordEntropy);
     if(password.length() < MINIMAL_PASSWORD_LENGTH){
-      infoMessage+="Provided password is too short!";
+      infoMessage+="| Register rejected! | Provided password is too short!";
     }
     else if(passwordEntropy < MINIMAL_PASSWORD_ENTROPY ){
-        infoMessage += " Provide stronger password to register! You can use uppercase and lowercase letters, special characters and digits!";
+        infoMessage+=("| Register rejected! | Provide stronger password to register! You can use uppercase and lowercase letters, special characters and digits!");
     } else {
-      infoMessage+="\n Successfully registered, you can log in now!";
+      infoMessage+="| \n Successfully registered, you can log in now!";
 
       BankUserCredentials bankUserCredentials = credentialsCipher.encryptCredentials(name, surname, identificationNumber);
 

@@ -29,7 +29,7 @@ const PartialLogin = () => {
             console.log('Error while fetching');
         })
         setIsPendingPassword(true);
-        navigate('/home');
+        navigate('/');
 
     }
 

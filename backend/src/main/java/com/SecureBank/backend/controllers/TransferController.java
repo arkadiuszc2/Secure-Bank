@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/authenticated")
+@RequestMapping("/api/authenticated")
 @RequiredArgsConstructor
 public class TransferController {
 

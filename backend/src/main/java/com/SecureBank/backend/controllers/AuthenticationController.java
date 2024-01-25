@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/unauthenticated")
+@RequestMapping("/api/unauthenticated")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -38,6 +38,7 @@ public class AuthenticationController {
     sessionIdCookie.setMaxAge(USER_COOKIE_EXP_TIME);
     sessionIdCookie.setHttpOnly(true);
     sessionIdCookie.setPath("/");
+    sessionIdCookie.setSecure(true);
     response.addCookie(sessionIdCookie);
 
     return "Successfully logged in - sessionId assigned";
@@ -57,6 +58,7 @@ public class AuthenticationController {
     sessionIdCookie.setMaxAge(USER_COOKIE_EXP_TIME);
     sessionIdCookie.setHttpOnly(true);
     sessionIdCookie.setPath("/");
+    sessionIdCookie.setSecure(true);
     response.addCookie(sessionIdCookie);
     return "Successfully logged in - sessionId assigned";
   }

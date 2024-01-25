@@ -32,7 +32,6 @@ export const authenticationApi = {
   },
 
   register(username, password, fullName, surname, identificationNumber) {
-    console.log('Register')
     return authenticationClient.get('/register', {
       params: {
         username: `${username}`,

@@ -9,14 +9,13 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 @RequiredArgsConstructor
-public class LoginRequestInterceptor implements HandlerInterceptor {
+public class UnauthenticatedRequestInterceptor implements HandlerInterceptor {
 
   private final LoginRequestLimiter loginRequestLimiter;
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
     String ipAddress = request.getRemoteAddr();
-    System.out.println("Get request from ip: " + ipAddress);
     loginRequestLimiter.saveRequestFromIp(ipAddress);
     boolean isIpAllowedToMakeRequest = loginRequestLimiter.isIpAllowedToMakeRequest(ipAddress);
 
