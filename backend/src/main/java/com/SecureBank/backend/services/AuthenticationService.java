@@ -101,7 +101,7 @@ public class AuthenticationService {
     } else {
       UserPassCharCombination userPassCharCombination = userPassCharCombinationsRepository.findBySelected(true);
           if(userPassCharCombination == null){
-            throw new RuntimeException("User didnt ask for character numbers");
+            throw new RuntimeException("Before providing characters fill in username and generate character positions");
           }
       byte [] combinationHash = userPassCharCombination.getCombinationHash();
       userPassCharCombination.setSelected(false);

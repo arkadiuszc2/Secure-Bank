@@ -5,6 +5,10 @@ logging:
 
 my-variables:
     key: IZeiyJbvnjQdA4tu5yc3hg==
+
+app:
+    cors:
+        allowed-origins: http://localhost:3000
 ---
 
 spring:
