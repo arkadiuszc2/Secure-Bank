@@ -12,8 +12,5 @@ public interface UserPassCharCombinationsRepository extends JpaRepository<UserPa
   Optional<UserPassCharCombination> findByCombinationNumberAndBankUser_Username(int combinationNumber, String username);
 
   UserPassCharCombination findBySelectedAndBankUser_Username(boolean isSelected, String username);
-
-  @Query("SELECT u FROM UserPassCharCombination u WHERE u.bankUser.username = :username ORDER BY RAND()")
-  Optional<UserPassCharCombination> findRandomCombinationForUsername(@Param("username") String username);
   void deleteAllByBankUserId(long bankUserId);
 }

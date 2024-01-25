@@ -72,18 +72,8 @@ public class PatternLoginService {
   public String getCharacterNumbers(String username) throws Exception {
     SecureRandom secureRandom = new SecureRandom();
     int combinationNumber = secureRandom.nextInt(COMBINATIONS_NUMBER);
-    Optional<UserPassCharCombination> optionalCombination = userPassCharCombinationsRepository
-        .findByCombinationNumberAndBankUser_Username(combinationNumber, username);
-
-    UserPassCharCombination userPassCharCombination;
-
-    if (!optionalCombination.isPresent()) {
-      userPassCharCombination = userPassCharCombinationsRepository.findRandomCombinationForUsername(username)
-          .orElseThrow(() -> new Exception("There is no users in bank!"));
-    } else {
-      userPassCharCombination = null;
-    }
-
+    UserPassCharCombination userPassCharCombination  = userPassCharCombinationsRepository.
+        findByCombinationNumberAndBankUser_Username(combinationNumber,username).orElseThrow(() -> new RuntimeException("Error while getting numbers"));
 
     byte [] charactersNumbersEncrypted = userPassCharCombination.getCharactersNumbers();
     byte [] iv = userPassCharCombination.getIv();
